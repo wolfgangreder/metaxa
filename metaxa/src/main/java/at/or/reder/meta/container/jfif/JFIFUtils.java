@@ -13,22 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.meta.container.jfif.impl;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
+package at.or.reder.meta.container.jfif;
 
 /**
  *
  * @author Wolfgang Reder
  */
-public interface SegmentSource
+public final class JFIFUtils
 {
 
-  public URL getURL();
+  public static boolean isExifEntry(JFIFEntry e)
+  {
+    return e != null && JFIFMarker.APP1.getMarker() == e.getMarker();
+  }
 
-  public InputStream openStream(long offset,
-                                int size) throws IOException;
+  private JFIFUtils()
+  {
+  }
 
 }

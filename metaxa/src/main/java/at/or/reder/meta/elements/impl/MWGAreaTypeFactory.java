@@ -13,22 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.meta.container.jfif.impl;
+package at.or.reder.meta.elements.impl;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
+import at.or.reder.meta.elements.ImageAreaType;
+import at.or.reder.meta.elements.spi.ImageAreaTypeProvider;
+import java.util.List;
 
 /**
  *
  * @author Wolfgang Reder
  */
-public interface SegmentSource
+public final class MWGAreaTypeFactory implements ImageAreaTypeProvider
 {
 
-  public URL getURL();
-
-  public InputStream openStream(long offset,
-                                int size) throws IOException;
+  @Override
+  public List<ImageAreaType> getAreaTypes()
+  {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
 
 }

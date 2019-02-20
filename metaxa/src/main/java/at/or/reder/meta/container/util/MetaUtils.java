@@ -13,22 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.meta.container.jfif.impl;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
+package at.or.reder.meta.container.util;
 
 /**
  *
  * @author Wolfgang Reder
  */
-public interface SegmentSource
+public final class MetaUtils
 {
 
-  public URL getURL();
+  public static String formatLong(long l)
+  {
+    StringBuilder b = new StringBuilder();
+    b.append(Long.toString(l));
+    b.append(" (0x");
+    String tmp = Long.toHexString(l);
+    int i = 0;
+//    for (; i < (8 - tmp.length()); ++i) {
+//      b.append('0');
+////      if (i == 3) {
+////        b.append(' ');
+////      }
+//    }
+    for (int j = 0; j < tmp.length(); ++j, ++i) {
+      b.append(tmp.charAt(j));
+//      if (i == 3) {
+//        b.append(' ');
+//      }
+    }
+    b.append(')');
+    return b.toString();
+  }
 
-  public InputStream openStream(long offset,
-                                int size) throws IOException;
+  private MetaUtils()
+  {
+  }
 
 }

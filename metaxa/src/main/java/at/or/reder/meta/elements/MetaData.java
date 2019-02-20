@@ -26,6 +26,6 @@ public interface MetaData
 
   public <M> M getRawDataModel(Class<? extends M> metaModel);
 
-  public <C> List<C> getElements(Class<? extends C> infoClass);
+  public <C extends MetaElement> List<C> getElements(Class<? extends C> infoClass);
 
 }

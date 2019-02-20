@@ -13,41 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.meta.container.jfif.impl;
+package at.or.reder.meta.elements.impl;
 
-import at.or.reder.meta.container.util.PositionInputStream;
+import at.or.reder.meta.elements.MetaSource;
+import java.util.ResourceBundle;
 
 /**
  *
  * @author Wolfgang Reder
  */
-public final class SOIEntry extends AbstractJFIFEntry
+public class XMPMetaSource implements MetaSource
 {
 
-  public static SOIEntry newInstance(PositionInputStream is,
-                                     int marker)
+  @Override
+  public String getName()
   {
-    return new SOIEntry(SegmentSourceFactory.instanceOf(is.getURL()),
-                        marker,
-                        is.getPosition() - 2);
-  }
-
-  public SOIEntry(SegmentSource source,
-                  int marker,
-                  long offset)
-  {
-    super(source,
-          marker,
-          "SOI",
-          0,
-          offset,
-          null);
+    return ResourceBundle.getBundle(XMPMetaSource.class.getName()).getString("XMPMetaSource_name");
   }
 
   @Override
-  public int getPrefixLength()
+  public String getLabel()
   {
-    return 2;
+    return "XMP";
+  }
+
+  @Override
+  public String getDescription()
+  {
+    return ResourceBundle.getBundle(XMPMetaSource.class.getName()).getString("XMPMetaSource_desc");
   }
 
 }

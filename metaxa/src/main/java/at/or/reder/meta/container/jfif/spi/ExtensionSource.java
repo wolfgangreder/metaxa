@@ -13,22 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.meta.container.jfif.impl;
+package at.or.reder.meta.container.jfif.spi;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 
 /**
  *
  * @author Wolfgang Reder
  */
-public interface SegmentSource
+public interface ExtensionSource<C>
 {
 
-  public URL getURL();
+  public C createExtension(InputStream is) throws IOException;
 
-  public InputStream openStream(long offset,
-                                int size) throws IOException;
+  public Class<? extends C> getRepresentaionClass();
 
 }

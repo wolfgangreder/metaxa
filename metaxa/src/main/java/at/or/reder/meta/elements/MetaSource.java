@@ -19,7 +19,13 @@ package at.or.reder.meta.elements;
  *
  * @author Wolfgang Reder
  */
-public enum MetaSource
+public interface MetaSource
 {
-  EXIF, IPTC, XMP;
+
+  public String getName();
+
+  public String getLabel();
+
+  public String getDescription();
+
 }

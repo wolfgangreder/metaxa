@@ -1,12 +1,21 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright 2019 Wolfgang Reder.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package at.or.reder.meta.container.util;
 
 import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,25 +33,33 @@ public final class PositionInputStream extends InputStream
   private long position;
   private long markedPosition = -1;
   private final InputStream w;
-  private InputStream backStream;
+  private final int rewindStep;
+  private ByteRingBuffer rewindBuffer;
+  private InputStream rewindStream;
 
-  public PositionInputStream(InputStream is)
+  public PositionInputStream(InputStream is,
+                             int backStep)
   {
     this(null,
-         is);
+         is,
+         backStep);
   }
 
   public PositionInputStream(URL u,
-                             long offset) throws IOException
+                             long offset,
+                             int backStep) throws IOException
   {
     this(u,
-         u.openStream());
+         u.openStream(),
+         backStep);
     skip(offset);
   }
 
   public PositionInputStream(URL u,
-                             InputStream w)
+                             InputStream w,
+                             int backStep)
   {
+    this.rewindStep = backStep;
     this.url = u;
     if (w.markSupported()) {
       this.w = w;
@@ -67,66 +84,58 @@ public final class PositionInputStream extends InputStream
     return markedPosition;
   }
 
-  private String formatLong(long l)
-  {
-    StringBuilder b = new StringBuilder();
-    b.append(Long.toString(l));
-    b.append(" (0x");
-    String tmp = Long.toHexString(l);
-    int i = 0;
-//    for (; i < (8 - tmp.length()); ++i) {
-//      b.append('0');
-////      if (i == 3) {
-////        b.append(' ');
-////      }
-//    }
-    for (int j = 0; j < tmp.length(); ++j, ++i) {
-      b.append(tmp.charAt(j));
-//      if (i == 3) {
-//        b.append(' ');
-//      }
-    }
-    b.append(')');
-    return b.toString();
-  }
-
   @Override
   public String toString()
   {
     if (markedPosition >= 0) {
-      return "PositionInputStream{" + "position=" + formatLong(position) + ", markedPosition=" + formatLong(markedPosition) + '}';
+      return "PositionInputStream{" + "position=" + MetaUtils.formatLong(position) + ", markedPosition=" + MetaUtils.formatLong(
+              markedPosition) + '}';
     } else {
-      return "PositionInputStream{" + "position=" + formatLong(position) + '}';
+      return "PositionInputStream{" + "position=" + MetaUtils.formatLong(position) + '}';
 
     }
   }
 
-  public boolean setBackBytes(byte[] b)
+  public boolean isRewindReadEnabled()
   {
-    if (markedPosition == -1 && b != null && b.length > 0) {
-      backStream = new ByteArrayInputStream(b);
-      position -= b.length;
-      return true;
+    return rewindBuffer != null;
+  }
+
+  public boolean setRewindReadEnabled(boolean en)
+  {
+    if (rewindBuffer == null && rewindStream == null && en) {
+      rewindBuffer = new ByteRingBuffer(rewindStep);
     } else {
-      backStream = null;
-      return false;
+      rewindBuffer = null;
     }
+    return isRewindReadEnabled();
+  }
+
+  public void rewind()
+  {
+    if (rewindBuffer != null && !rewindBuffer.isEmpty()) {
+      rewindStream = rewindBuffer;
+    }
+    rewindBuffer = null;
   }
 
   @Override
   public int read() throws IOException
   {
     int result;
-    if (backStream != null) {
-      result = backStream.read();
+    if (rewindStream != null) {
+      result = rewindStream.read();
       if (result == -1) {
-        backStream = null;
+        rewindStream = null;
       } else {
         return result;
       }
     }
     result = w.read();
     if (result >= 0) {
+      if (rewindBuffer != null) {
+        rewindBuffer.push((byte) result);
+      }
       ++position;
     }
     return result;
@@ -150,7 +159,7 @@ public final class PositionInputStream extends InputStream
   @Override
   public boolean markSupported()
   {
-    return backStream == null && w.markSupported();
+    return rewindStream == null && w.markSupported();
   }
 
   @Override
@@ -161,6 +170,7 @@ public final class PositionInputStream extends InputStream
     }
     position = markedPosition;
     markedPosition = -1;
+    setRewindReadEnabled(false);
     w.reset();
   }
 
@@ -176,14 +186,15 @@ public final class PositionInputStream extends InputStream
   @Override
   public void close() throws IOException
   {
-    backStream = null;
+    rewindStream = null;
+    rewindBuffer = null;
     w.close();
   }
 
   @Override
   public int available() throws IOException
   {
-    int result = backStream != null ? backStream.available() : 0;
+    int result = rewindStream != null ? rewindStream.available() : 0;
     result += w.available();
     return result;
   }
@@ -193,10 +204,10 @@ public final class PositionInputStream extends InputStream
   {
     long s;
     long result = 0;
-    if (backStream != null) {
-      n -= backStream.skip(n);
-      if (backStream.available() == 0) {
-        backStream = null;
+    if (rewindStream != null) {
+      n -= rewindStream.skip(n);
+      if (rewindStream.available() == 0) {
+        rewindStream = null;
       }
     }
     do {
@@ -205,6 +216,7 @@ public final class PositionInputStream extends InputStream
       result += s;
       n -= s;
     } while (n > 0 && s > 0);
+    setRewindReadEnabled(false);
     return result;
   }
 
@@ -214,34 +226,44 @@ public final class PositionInputStream extends InputStream
                         int len) throws IOException
   {
     int result = 0;
-    if (backStream != null) {
-      result = backStream.readNBytes(b,
-                                     off,
-                                     len);
+    if (rewindStream != null) {
+      result = rewindStream.readNBytes(b,
+                                       off,
+                                       len);
     }
     result = w.readNBytes(b,
                           off + result,
                           len - result);
     position += result;
+    if (rewindBuffer != null) {
+      rewindBuffer.push(b,
+                        off,
+                        result);
+    }
     return result;
   }
 
   @Override
   public byte[] readNBytes(int len) throws IOException
   {
-    if (backStream != null) {
+    if (rewindStream != null) {
+      assert rewindBuffer == null : "backBuffer is not null";
       ByteArrayOutputStream bos = new ByteArrayOutputStream(len);
-      byte[] tmp = backStream.readNBytes(len);
+      byte[] tmp = rewindStream.readNBytes(len);
       bos.write(tmp);
       len -= tmp.length;
-      if (backStream.available() == 0) {
-        backStream = null;
+      if (rewindStream.available() == 0) {
+        rewindStream = null;
       }
       tmp = w.readNBytes(len);
       bos.write(tmp);
+      position += len;
       return bos.toByteArray();
     } else {
       byte[] result = w.readNBytes(len);
+      if (rewindBuffer != null) {
+        rewindBuffer.push(result);
+      }
       position += result.length;
       return result;
     }
@@ -250,16 +272,19 @@ public final class PositionInputStream extends InputStream
   @Override
   public byte[] readAllBytes() throws IOException
   {
-    if (backStream != null) {
+    if (rewindStream != null) {
       ByteArrayOutputStream bos = new ByteArrayOutputStream();
-      byte[] tmp = backStream.readAllBytes();
-      backStream = null;
+      byte[] tmp = rewindStream.readAllBytes();
+      rewindStream = null;
       bos.write(tmp);
       tmp = w.readAllBytes();
       bos.write(tmp);
       return bos.toByteArray();
     } else {
       byte[] result = w.readAllBytes();
+      if (rewindBuffer != null) {
+        rewindBuffer.push(result);
+      }
       position += result.length;
       return result;
     }
@@ -270,18 +295,21 @@ public final class PositionInputStream extends InputStream
                   int off,
                   int len) throws IOException
   {
-    if (backStream != null) {
-      int result = backStream.read(b,
-                                   off,
-                                   len);
-      if (backStream.available() == 0) {
-        backStream = null;
+    if (rewindStream != null) {
+      int result = rewindStream.read(b,
+                                     off,
+                                     len);
+      if (rewindStream.available() == 0) {
+        rewindStream = null;
       }
       return result;
     } else {
       int result = w.read(b,
                           off,
                           len);
+      if (rewindBuffer != null) {
+
+      }
       position += result;
       return result;
     }
@@ -290,14 +318,19 @@ public final class PositionInputStream extends InputStream
   @Override
   public int read(byte[] b) throws IOException
   {
-    if (backStream != null) {
-      int result = backStream.read(b);
-      if (backStream.available() == 0) {
-        backStream = null;
+    if (rewindStream != null) {
+      int result = rewindStream.read(b);
+      if (rewindStream.available() == 0) {
+        rewindStream = null;
       }
       return result;
     } else {
       int result = w.read(b);
+      if (rewindBuffer != null) {
+        rewindBuffer.push(b,
+                          0,
+                          result);
+      }
       position += result;
       return result;
     }

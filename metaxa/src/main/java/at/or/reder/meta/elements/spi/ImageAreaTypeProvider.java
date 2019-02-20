@@ -13,22 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.meta.container.jfif.impl;
+package at.or.reder.meta.elements.spi;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
+import at.or.reder.meta.elements.ImageAreaType;
+import java.util.List;
 
 /**
  *
  * @author Wolfgang Reder
  */
-public interface SegmentSource
+public interface ImageAreaTypeProvider
 {
 
-  public URL getURL();
-
-  public InputStream openStream(long offset,
-                                int size) throws IOException;
+  public List<ImageAreaType> getAreaTypes();
 
 }

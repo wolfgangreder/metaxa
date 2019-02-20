@@ -13,38 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.meta.container.jfif;
+package at.or.reder.meta.container;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Represents a JFIF Marker Entry.
- * <pre>
- * Layout of Entry:
- * 0  1  2  3  4
- * ff xx ss ss pp ...         pp dd ....                         dd
- *       |&lt;getPrefixLen()&gt;||&lt;------ getLength() -----&gt;|
- *       |&lt; ss                                             &gt;|
- * ^                             ^
- * |                             |
- * getOffset()                   getDataOffset()
- * </pre>
  *
  * @author Wolfgang Reder
  */
-public interface JFIFEntry extends Comparable<JFIFEntry>
+public interface ContainerEntry
 {
 
   /**
-   * Marker byte of JFIFEntry (e.g 0xffe0, ....)
-   *
-   * @return marker byte
-   */
-  public int getMarker();
-
-  /**
-   * Name of the Marker (e.g. APP0,SOI,...)
+   * Name of the Entity
    *
    * @return Name of Marker
    */
@@ -81,19 +63,8 @@ public interface JFIFEntry extends Comparable<JFIFEntry>
    */
   public long getOffset();
 
-  public default long getDataOffset()
-  {
-    return getOffset() + getPrefixLength();
-  }
+  public long getDataOffset();
 
-  public default int getPrefixLength()
-  {
-    return 4;
-  }
-
-  public default <C> C getDataRepresentation(Class<? extends C> representationClass) throws IOException
-  {
-    return null;
-  }
+  public <C> C getDataRepresentation(Class<? extends C> representationClass) throws IOException;
 
 }

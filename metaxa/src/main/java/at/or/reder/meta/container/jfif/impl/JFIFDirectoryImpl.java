@@ -1,16 +1,26 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright 2019 Wolfgang Reder.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package at.or.reder.meta.container.jfif.impl;
 
 import at.or.reder.meta.container.jfif.JFIFDirectory;
 import at.or.reder.meta.container.jfif.JFIFEntry;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  *
@@ -23,7 +33,7 @@ public final class JFIFDirectoryImpl implements JFIFDirectory
 
   public JFIFDirectoryImpl(Collection<? extends JFIFEntry> entries)
   {
-    this.entries = Collections.unmodifiableList(entries.stream().sorted().collect(Collectors.toList()));
+    this.entries = Collections.unmodifiableList(new ArrayList<>(entries));
   }
 
   @Override
