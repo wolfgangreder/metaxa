@@ -64,7 +64,8 @@ public final class APPxEntry extends AbstractJFIFEntry
                          extName,
                          is.getURL(),
                          offset,
-                         prefixSize);
+                         prefixSize,
+                         null);
   }
 
   private static APPxEntry newAPP1Entry(PositionInputStream is) throws IOException
@@ -84,16 +85,22 @@ public final class APPxEntry extends AbstractJFIFEntry
     length -= prefixSize;
     skipToEndOfEntryLength(is,
                            length);
+    ExtensionSource<?> extSource = null;
+    if (XMPMetaSource.JFIF_EXTENSION_NAME.equals(extName)) {
+      extSource = new XMPMetaSource();
+    }
     return new APPxEntry(0xffe0,
                          "APP1",
                          length,
                          extName,
                          is.getURL(),
                          offset,
-                         prefixSize);
+                         prefixSize,
+                         extSource);
   }
 
   private final int prefixSize;
+  private final ExtensionSource<?> extensionFactory;
 
   public APPxEntry(int marker,
                    String name,
@@ -101,7 +108,8 @@ public final class APPxEntry extends AbstractJFIFEntry
                    String extensionName,
                    URL url,
                    long offset,
-                   int prefixSize)
+                   int prefixSize,
+                   ExtensionSource<?> extensionFactory)
   {
     super(SegmentSourceFactory.instanceOf(url),
           marker,
@@ -110,12 +118,22 @@ public final class APPxEntry extends AbstractJFIFEntry
           offset,
           extensionName);
     this.prefixSize = prefixSize;
+    this.extensionFactory = extensionFactory;
   }
 
   @Override
   public int getPrefixLength()
   {
     return prefixSize + 2;
+  }
+
+  @Override
+  public <C> C getDataRepresentation(Class<? extends C> representationClass) throws IOException
+  {
+    if (extensionFactory != null && representationClass.isAssignableFrom(extensionFactory.getRepresentaionClass())) {
+      return representationClass.cast(extensionFactory.createExtension(getDataStream()));
+    }
+    return null;
   }
 
 }

@@ -77,6 +77,16 @@ public abstract class AbstractJFIFEntry implements JFIFEntry
   }
 
   @Override
+  public InputStream getDataStream() throws IOException
+  {
+    if (source != null) {
+      return source.openStream(offset + getPrefixLength(),
+                               getLength());
+    }
+    return null;
+  }
+
+  @Override
   public long getOffset()
   {
     return offset;

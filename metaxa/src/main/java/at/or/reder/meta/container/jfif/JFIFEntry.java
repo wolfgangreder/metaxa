@@ -55,12 +55,14 @@ public interface JFIFEntry extends Comparable<JFIFEntry>
   public String getExtensionName();
 
   /**
-   * Datastream for the Segment.Data without marker,length, or extension name
+   * Datastream for the Segment <em>with</em> marker and length.
    *
    * @return Stream with data.
    * @throws java.io.IOException on IOError
    */
   public InputStream getInputStream() throws IOException;
+
+  public InputStream getDataStream() throws IOException;
 
   /**
    * Offset of Segment with the original stream
@@ -77,6 +79,11 @@ public interface JFIFEntry extends Comparable<JFIFEntry>
   public default int getPrefixLength()
   {
     return 4;
+  }
+
+  public default <C> C getDataRepresentation(Class<? extends C> representationClass) throws IOException
+  {
+    return null;
   }
 
 }

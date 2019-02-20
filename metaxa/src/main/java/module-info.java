@@ -7,6 +7,8 @@
 module Metaxa {
   exports at.or.reder.meta.container.jfif;
   exports at.or.reder.meta.container.util;
+  exports at.or.reder.meta.elements;
 
   requires java.logging;
+  requires xmpcore;
 }
