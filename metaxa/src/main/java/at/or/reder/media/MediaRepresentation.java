@@ -13,34 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.meta.elements.impl;
-
-import java.util.ResourceBundle;
-import at.or.reder.meta.MetadataSpecification;
+package at.or.reder.media;
 
 /**
  *
  * @author Wolfgang Reder
  */
-public class XMPMetaSource implements MetadataSpecification
+public enum MediaRepresentation
 {
-
-  @Override
-  public String getName()
-  {
-    return ResourceBundle.getBundle(XMPMetaSource.class.getName()).getString("XMPMetaSource_name");
-  }
-
-  @Override
-  public String getLabel()
-  {
-    return "XMP";
-  }
-
-  @Override
-  public String getDescription()
-  {
-    return ResourceBundle.getBundle(XMPMetaSource.class.getName()).getString("XMPMetaSource_desc");
-  }
-
+  MEDIA,
+  THUMBNAIL,
+  METADATA;
 }

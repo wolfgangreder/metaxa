@@ -13,34 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.meta.elements.impl;
+package at.or.reder.media.spi;
 
-import java.util.ResourceBundle;
-import at.or.reder.meta.MetadataSpecification;
+import at.or.reder.media.MediaContainer;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 
 /**
  *
  * @author Wolfgang Reder
  */
-public class XMPMetaSource implements MetadataSpecification
+public interface MediaContainerProvider
 {
 
-  @Override
-  public String getName()
-  {
-    return ResourceBundle.getBundle(XMPMetaSource.class.getName()).getString("XMPMetaSource_name");
-  }
+  public boolean isValidFor(String mimeType);
 
-  @Override
-  public String getLabel()
-  {
-    return "XMP";
-  }
+  public boolean isValidFor(InputStream is);
 
-  @Override
-  public String getDescription()
-  {
-    return ResourceBundle.getBundle(XMPMetaSource.class.getName()).getString("XMPMetaSource_desc");
-  }
+  public boolean isValidFor(URL url);
+
+  public boolean isValidFor(File file);
+
+  public MediaContainer createContainer(InputStream is) throws IOException;
+
+  public MediaContainer createContainer(URL url) throws IOException;
+
+  public MediaContainer createContainer(File file) throws IOException;
 
 }

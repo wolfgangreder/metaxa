@@ -16,6 +16,7 @@
 package at.or.reder.meta.elements;
 
 import java.util.Locale;
+import at.or.reder.meta.MetadataSpecification;
 
 /**
  *
@@ -24,7 +25,7 @@ import java.util.Locale;
 public interface MetaElement
 {
 
-  public MetaSource getSource();
+  public MetadataSpecification getSource();
 
   public String getName();
 

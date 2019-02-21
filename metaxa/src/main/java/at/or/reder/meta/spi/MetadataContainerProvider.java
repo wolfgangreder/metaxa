@@ -13,34 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.meta.elements.impl;
+package at.or.reder.meta.spi;
 
-import java.util.ResourceBundle;
+import at.or.reder.meta.MetadataContainer;
 import at.or.reder.meta.MetadataSpecification;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  *
  * @author Wolfgang Reder
  */
-public class XMPMetaSource implements MetadataSpecification
+public interface MetadataContainerProvider
 {
 
-  @Override
-  public String getName()
-  {
-    return ResourceBundle.getBundle(XMPMetaSource.class.getName()).getString("XMPMetaSource_name");
-  }
+  public MetadataSpecification getSpecification();
 
-  @Override
-  public String getLabel()
-  {
-    return "XMP";
-  }
-
-  @Override
-  public String getDescription()
-  {
-    return ResourceBundle.getBundle(XMPMetaSource.class.getName()).getString("XMPMetaSource_desc");
-  }
+  public MetadataContainer createContainer(InputStream is) throws IOException;
 
 }

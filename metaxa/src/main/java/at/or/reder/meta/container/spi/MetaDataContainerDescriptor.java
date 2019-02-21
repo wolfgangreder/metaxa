@@ -13,19 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.meta.elements;
+package at.or.reder.meta.container.spi;
 
 /**
+ * Describes a Metadata Container like Exif,IPTC or XMP
  *
  * @author Wolfgang Reder
  */
-public interface MetaSource
+public interface MetaDataContainerDescriptor
 {
-
-  public String getName();
-
-  public String getLabel();
-
-  public String getDescription();
 
 }

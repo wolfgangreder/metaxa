@@ -13,34 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.meta.elements.impl;
-
-import java.util.ResourceBundle;
-import at.or.reder.meta.MetadataSpecification;
+package at.or.reder.meta;
 
 /**
  *
  * @author Wolfgang Reder
  */
-public class XMPMetaSource implements MetadataSpecification
+public interface MetadataSpecification
 {
 
-  @Override
-  public String getName()
-  {
-    return ResourceBundle.getBundle(XMPMetaSource.class.getName()).getString("XMPMetaSource_name");
-  }
+  public String getName();
 
-  @Override
-  public String getLabel()
-  {
-    return "XMP";
-  }
+  public String getLabel();
 
-  @Override
-  public String getDescription()
-  {
-    return ResourceBundle.getBundle(XMPMetaSource.class.getName()).getString("XMPMetaSource_desc");
-  }
+  public String getDescription();
 
 }

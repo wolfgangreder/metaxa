@@ -15,15 +15,11 @@
  */
 
 module Metaxa {
-  exports at.or.reder.meta.container.jfif;
-  exports at.or.reder.meta.container.jfif.spi;
-  exports at.or.reder.meta.container.util;
-  exports at.or.reder.meta.elements;
-  exports at.or.reder.meta.elements.spi;
+  exports at.or.reder.media;
+  exports at.or.reder.media.spi;
+  exports at.or.reder.meta;
+  exports at.or.reder.meta.spi;
 
-  provides at.or.reder.meta.elements.spi.ImageAreaTypeProvider with at.or.reder.meta.elements.impl.MWGAreaTypeFactory;
-  provides at.or.reder.meta.elements.MetaSource with at.or.reder.meta.elements.impl.XMPMetaSource;
-
-  requires java.logging;
-  requires xmpcore;
+  requires transitive java.desktop;
+  requires static xmpcore;
 }

@@ -16,21 +16,22 @@
 package at.or.reder.meta.elements.impl;
 
 import at.or.reder.meta.elements.ImageArea;
-import at.or.reder.meta.elements.MetaData;
+import at.or.reder.meta.elements.MetaElement;
 import com.adobe.internal.xmp.XMPMeta;
 import java.util.Collections;
 import java.util.List;
+import at.or.reder.meta.MetadataContainer;
 
 /**
  *
  * @author Wolfgang Reder
  */
-public class XMPMetaData implements MetaData
+public class XMPMetaDataContainer implements MetadataContainer
 {
 
   private final XMPMeta meta;
 
-  public XMPMetaData(XMPMeta meta)
+  public XMPMetaDataContainer(XMPMeta meta)
   {
     this.meta = meta;
   }
@@ -45,7 +46,7 @@ public class XMPMetaData implements MetaData
   }
 
   @Override
-  public <C> List<C> getElements(Class<? extends C> infoClass)
+  public <C extends MetaElement> List<C> getElements(Class<? extends C> infoClass)
   {
     if (ImageArea.class == infoClass) {
 
