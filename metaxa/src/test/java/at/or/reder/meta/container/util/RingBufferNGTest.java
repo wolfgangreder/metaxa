@@ -15,6 +15,7 @@
  */
 package at.or.reder.meta.container.util;
 
+import at.or.reder.media.util.RingBuffer;
 import static org.testng.AssertJUnit.*;
 import org.testng.annotations.Test;
 
@@ -55,7 +56,7 @@ public class RingBufferNGTest
   @Test
   public void testPush()
   {
-    RingBuffer<Character> instance = new RingBuffer(5);
+    RingBuffer<Character> instance = new RingBuffer<>(5);
     assertEquals(0,
                  instance.getSize());
     instance.push('W');
@@ -80,7 +81,7 @@ public class RingBufferNGTest
   @Test
   public void testClear()
   {
-    RingBuffer<Character> instance = new RingBuffer(5);
+    RingBuffer<Character> instance = new RingBuffer<>(5);
     assertEquals(0,
                  instance.getSize());
     instance.push('W');
@@ -97,7 +98,7 @@ public class RingBufferNGTest
   @Test
   public void testFillArray()
   {
-    RingBuffer<Character> instance = new RingBuffer(5);
+    RingBuffer<Character> instance = new RingBuffer<>(5);
     Character[] array = new Character[0];
     Character[] car = instance.fillArray(array);
     assertSame(array,
@@ -131,7 +132,7 @@ public class RingBufferNGTest
   @Test
   public void testFillArray1()
   {
-    RingBuffer<Character> instance = new RingBuffer(1);
+    RingBuffer<Character> instance = new RingBuffer<>(1);
     Character[] array = new Character[0];
     Character[] car = instance.fillArray(array);
     assertSame(array,

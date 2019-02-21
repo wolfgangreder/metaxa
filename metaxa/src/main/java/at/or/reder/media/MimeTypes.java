@@ -13,34 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.meta;
+package at.or.reder.media;
 
 /**
  *
  * @author Wolfgang Reder
  */
-public interface MetadataSpecification
+public enum MimeTypes
 {
+  APPLICATION_OCTET_STREAM("application/octet-stream"),
+  IMAGE_JPEG("image/jpeg");
+  private final String mimeType;
 
-  /**
-   * Namespace of Metadata. Used as Id
-   *
-   * @return namespace
-   */
-  public String getNamespace();
+  private MimeTypes(String mt)
+  {
+    this.mimeType = mt;
+  }
 
-  /**
-   * Name of Metadata
-   *
-   * @return label
-   */
-  public String getLabel();
+  public String getMimeType()
+  {
+    return mimeType;
+  }
 
-  /**
-   * Description of Metadata
-   *
-   * @return description
-   */
-  public String getDescription();
+  public static MimeTypes valueOfMime(String mt)
+  {
+    for (MimeTypes m : values()) {
+      if (m.mimeType.equals(mt)) {
+        return m;
+      }
+    }
+    return APPLICATION_OCTET_STREAM;
+  }
 
 }

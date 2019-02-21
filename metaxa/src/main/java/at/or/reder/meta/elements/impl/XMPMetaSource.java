@@ -15,8 +15,8 @@
  */
 package at.or.reder.meta.elements.impl;
 
-import java.util.ResourceBundle;
 import at.or.reder.meta.MetadataSpecification;
+import java.util.ResourceBundle;
 
 /**
  *
@@ -26,6 +26,11 @@ public class XMPMetaSource implements MetadataSpecification
 {
 
   @Override
+  public String getNamespace()
+  {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
+
   public String getName()
   {
     return ResourceBundle.getBundle(XMPMetaSource.class.getName()).getString("XMPMetaSource_name");

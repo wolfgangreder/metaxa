@@ -15,10 +15,12 @@
  */
 package at.or.reder.media;
 
-import at.or.reder.media.MediaContainer;
+import at.or.reder.media.util.Lookup;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -26,6 +28,35 @@ import java.net.URL;
  */
 public final class MediaContainerFactory
 {
+
+  private static final List<MediaContainerProvider> providerList = new ArrayList<>();
+  private static boolean providerLoaded = false;
+
+  private static void reloadProvider()
+  {
+    try {
+      providerList.clear();
+      providerList.addAll(Lookup.lookupAllInstances(MediaContainerProvider.class));
+    } finally {
+      providerLoaded = true;
+    }
+
+  }
+
+  public static List<MediaContainerProvider> getInstalledMediaContainerProvider()
+  {
+    return getInstalledMediaContainerProvider(false);
+  }
+
+  public static List<MediaContainerProvider> getInstalledMediaContainerProvider(boolean reload)
+  {
+    synchronized (providerList) {
+      if (reload || !providerLoaded) {
+        reloadProvider();
+      }
+      return new ArrayList<>(providerList);
+    }
+  }
 
   public static MediaContainer createContainer(URL url) throws IOException
   {

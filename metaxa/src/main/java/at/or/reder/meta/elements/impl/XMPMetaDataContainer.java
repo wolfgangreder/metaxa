@@ -15,12 +15,13 @@
  */
 package at.or.reder.meta.elements.impl;
 
+import at.or.reder.meta.MetadataContainer;
+import at.or.reder.meta.MetadataSpecification;
 import at.or.reder.meta.elements.ImageArea;
 import at.or.reder.meta.elements.MetaElement;
 import com.adobe.internal.xmp.XMPMeta;
 import java.util.Collections;
 import java.util.List;
-import at.or.reder.meta.MetadataContainer;
 
 /**
  *
@@ -52,6 +53,12 @@ public class XMPMetaDataContainer implements MetadataContainer
 
     }
     return Collections.emptyList();
+  }
+
+  @Override
+  public MetadataSpecification getSpecification()
+  {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
 }

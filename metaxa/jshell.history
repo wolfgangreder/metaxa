@@ -1,0 +1,5 @@
+IMPORT#>import at.or.reder.media.MediaContainerProvider;\
+	ServiceLoader<MediaContainerProvider> provider = ServiceLoader.load(MediaContainerProvider.class);
+IMPORT#>import java.util.ServiceLoader;
+VAR#>ServiceLoader<MediaContainerProvider> provider = ServiceLoader.load(MediaContainerProvider.class);
+VAR#>java.util.ServiceLoader<MediaContainerProvider> provider = java.util.ServiceLoader.load(MediaContainerProvider.class);

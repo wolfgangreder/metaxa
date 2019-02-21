@@ -13,34 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.meta;
+package at.or.reder.media.io;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 
 /**
  *
  * @author Wolfgang Reder
  */
-public interface MetadataSpecification
+public interface SegmentSource
 {
 
-  /**
-   * Namespace of Metadata. Used as Id
-   *
-   * @return namespace
-   */
-  public String getNamespace();
+  public URL getURL();
 
-  /**
-   * Name of Metadata
-   *
-   * @return label
-   */
-  public String getLabel();
-
-  /**
-   * Description of Metadata
-   *
-   * @return description
-   */
-  public String getDescription();
+  public InputStream openStream(long offset,
+                                int size) throws IOException;
 
 }

@@ -15,6 +15,7 @@
  */
 package at.or.reder.meta.container.util;
 
+import at.or.reder.media.util.ByteRingBuffer;
 import java.nio.ByteBuffer;
 import static org.testng.AssertJUnit.*;
 import org.testng.annotations.Test;

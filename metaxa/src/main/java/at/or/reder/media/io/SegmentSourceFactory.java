@@ -13,34 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.meta;
+package at.or.reder.media.io;
+
+import java.net.URL;
+import java.nio.file.Paths;
+import java.util.Objects;
 
 /**
  *
  * @author Wolfgang Reder
  */
-public interface MetadataSpecification
+public final class SegmentSourceFactory
 {
 
-  /**
-   * Namespace of Metadata. Used as Id
-   *
-   * @return namespace
-   */
-  public String getNamespace();
+  public static SegmentSource instanceOf(URL u)
+  {
+    if ("file".equals(Objects.requireNonNull(u,
+                                             "url is null").getProtocol())) {
+      return new FileSegmentSource(Paths.get(u.getFile()));
+    } else {
+      throw new IllegalArgumentException("Unsupported protokoll");
+    }
+  }
 
-  /**
-   * Name of Metadata
-   *
-   * @return label
-   */
-  public String getLabel();
-
-  /**
-   * Description of Metadata
-   *
-   * @return description
-   */
-  public String getDescription();
+  private SegmentSourceFactory()
+  {
+  }
 
 }

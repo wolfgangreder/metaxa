@@ -13,34 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.meta;
+package at.or.reder.media;
+
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  *
  * @author Wolfgang Reder
  */
-public interface MetadataSpecification
+public class MediaContainerFactoryNGTest
 {
 
-  /**
-   * Namespace of Metadata. Used as Id
-   *
-   * @return namespace
-   */
-  public String getNamespace();
+  public MediaContainerFactoryNGTest()
+  {
+  }
 
-  /**
-   * Name of Metadata
-   *
-   * @return label
-   */
-  public String getLabel();
+  @BeforeClass
+  public static void setUpClass() throws Exception
+  {
+  }
 
-  /**
-   * Description of Metadata
-   *
-   * @return description
-   */
-  public String getDescription();
+  @Test
+  public void testGetInstalledMediaContainerProvider_boolean()
+  {
+  }
+
+  @Test
+  public void testCreateContainer_URL() throws Exception
+  {
+  }
+
+  @Test
+  public void testCreateContainer_File() throws Exception
+  {
+  }
 
 }

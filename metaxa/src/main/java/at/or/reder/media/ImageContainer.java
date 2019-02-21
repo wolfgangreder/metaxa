@@ -15,7 +15,6 @@
  */
 package at.or.reder.media;
 
-import at.or.reder.media.MediaContainer;
 import at.or.reder.meta.MetadataContainer;
 import java.awt.image.BufferedImage;
 import java.io.IOException;

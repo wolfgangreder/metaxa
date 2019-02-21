@@ -13,34 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.meta;
+package at.or.reder.media.jfif;
+
+import at.or.reder.media.MediaContainer;
+import java.util.List;
 
 /**
  *
  * @author Wolfgang Reder
  */
-public interface MetadataSpecification
+public interface JFIFMediaContainer extends MediaContainer
 {
 
-  /**
-   * Namespace of Metadata. Used as Id
-   *
-   * @return namespace
-   */
-  public String getNamespace();
-
-  /**
-   * Name of Metadata
-   *
-   * @return label
-   */
-  public String getLabel();
-
-  /**
-   * Description of Metadata
-   *
-   * @return description
-   */
-  public String getDescription();
+  public List<JFIFEntry> getJFIFEntries();
 
 }
