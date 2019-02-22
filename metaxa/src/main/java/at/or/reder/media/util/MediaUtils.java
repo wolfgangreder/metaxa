@@ -15,6 +15,9 @@
  */
 package at.or.reder.media.util;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Objects;
@@ -80,6 +83,18 @@ public final class MediaUtils
       }
     }
     return spi;
+  }
+
+  public static void transferTo(InputStream is,
+                                OutputStream os) throws IOException
+  {
+    byte[] buffer = new byte[8192];
+    int read;
+    while ((read = is.read(buffer)) > 0) {
+      os.write(buffer,
+               0,
+               read);
+    }
   }
 
   private MediaUtils()

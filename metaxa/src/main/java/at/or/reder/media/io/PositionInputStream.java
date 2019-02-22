@@ -18,7 +18,6 @@ package at.or.reder.media.io;
 import at.or.reder.media.util.ByteRingBuffer;
 import at.or.reder.media.util.MediaUtils;
 import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -220,76 +219,6 @@ public final class PositionInputStream extends InputStream
     } while (n > 0 && s > 0);
     setRewindReadEnabled(false);
     return result;
-  }
-
-  @Override
-  public int readNBytes(byte[] b,
-                        int off,
-                        int len) throws IOException
-  {
-    int result = 0;
-    if (rewindStream != null) {
-      result = rewindStream.readNBytes(b,
-                                       off,
-                                       len);
-    }
-    result = w.readNBytes(b,
-                          off + result,
-                          len - result);
-    position += result;
-    if (rewindBuffer != null) {
-      rewindBuffer.push(b,
-                        off,
-                        result);
-    }
-    return result;
-  }
-
-  @Override
-  public byte[] readNBytes(int len) throws IOException
-  {
-    if (rewindStream != null) {
-      assert rewindBuffer == null : "backBuffer is not null";
-      ByteArrayOutputStream bos = new ByteArrayOutputStream(len);
-      byte[] tmp = rewindStream.readNBytes(len);
-      bos.write(tmp);
-      len -= tmp.length;
-      if (rewindStream.available() == 0) {
-        rewindStream = null;
-      }
-      tmp = w.readNBytes(len);
-      bos.write(tmp);
-      position += len;
-      return bos.toByteArray();
-    } else {
-      byte[] result = w.readNBytes(len);
-      if (rewindBuffer != null) {
-        rewindBuffer.push(result);
-      }
-      position += result.length;
-      return result;
-    }
-  }
-
-  @Override
-  public byte[] readAllBytes() throws IOException
-  {
-    if (rewindStream != null) {
-      ByteArrayOutputStream bos = new ByteArrayOutputStream();
-      byte[] tmp = rewindStream.readAllBytes();
-      rewindStream = null;
-      bos.write(tmp);
-      tmp = w.readAllBytes();
-      bos.write(tmp);
-      return bos.toByteArray();
-    } else {
-      byte[] result = w.readAllBytes();
-      if (rewindBuffer != null) {
-        rewindBuffer.push(result);
-      }
-      position += result.length;
-      return result;
-    }
   }
 
   @Override
