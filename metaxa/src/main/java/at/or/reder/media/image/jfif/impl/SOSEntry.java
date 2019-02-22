@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.media.jfif.impl;
+package at.or.reder.media.image.jfif.impl;
 
+import at.or.reder.media.image.jfif.impl.AbstractJFIFEntry;
 import at.or.reder.media.io.SegmentSourceFactory;
 import at.or.reder.media.io.SegmentSource;
 import at.or.reder.media.io.PositionInputStream;
@@ -24,50 +25,56 @@ import java.io.IOException;
  *
  * @author Wolfgang Reder
  */
-public final class DQTEntry extends AbstractJFIFEntry
+public final class SOSEntry extends AbstractJFIFEntry
 {
 
-  public static DQTEntry newInstance(PositionInputStream is,
+  public static SOSEntry newInstance(PositionInputStream is,
                                      int marker) throws IOException
   {
     long offset = is.getPosition() - 2;
-    int length = loadShort(is) - 2;
-    if (length == -1) {
-      return null;
-    }
-    skipToEndOfEntryLength(is,
-                           length);
-    return new DQTEntry(SegmentSourceFactory.instanceOf(is.getURL()),
+    int length = skipToEndOfEntry(is);
+    return new SOSEntry(SegmentSourceFactory.instanceOf(is.getURL()),
                         marker,
-                        "DQT",
+                        "SOS",
                         length,
-                        offset);
+                        offset,
+                        null);
   }
 
-  public DQTEntry(SegmentSource source,
+  public static int skipToEndOfEntry(PositionInputStream is) throws IOException
+  {
+    boolean ffDetected;
+    int b = 0;
+    long length = is.getPosition();
+    is.setRewindReadEnabled(true);
+    do {
+      ffDetected = b == 0xff;
+      b = is.read();
+      if (b != -1) {
+        b = b & 0xff;
+      }
+    } while (b != -1 && !(ffDetected && b != 0));
+    length = is.getPosition() - length;
+    if (b != -1) {
+      length -= 2;
+      is.rewind();
+    }
+    return (int) length;
+  }
+
+  public SOSEntry(SegmentSource source,
                   int marker,
                   String name,
                   int length,
-                  long offset)
+                  long offset,
+                  String extensionName)
   {
     super(source,
           marker,
           name,
           length,
           offset,
-          null);
-  }
-
-  @Override
-  public long getDataOffset()
-  {
-    return super.getDataOffset(); //To change body of generated methods, choose Tools | Templates.
-  }
-
-  @Override
-  public int getPrefixLength()
-  {
-    return super.getPrefixLength(); //To change body of generated methods, choose Tools | Templates.
+          extensionName);
   }
 
 }

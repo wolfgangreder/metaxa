@@ -15,12 +15,12 @@
  */
 package at.or.reder.media;
 
-import at.or.reder.media.util.Lookup;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import org.openide.util.Lookup;
 
 /**
  *
@@ -36,7 +36,7 @@ public final class MediaContainerFactory
   {
     try {
       providerList.clear();
-      providerList.addAll(Lookup.lookupAllInstances(MediaContainerProvider.class));
+      providerList.addAll(Lookup.getDefault().lookupAll(MediaContainerProvider.class));
     } finally {
       providerLoaded = true;
     }

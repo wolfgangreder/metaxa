@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.media.jfif.impl;
+package at.or.reder.media.image.jfif.impl;
 
+import at.or.reder.media.image.jfif.impl.AbstractJFIFEntry;
 import at.or.reder.media.io.SegmentSourceFactory;
 import at.or.reder.media.io.SegmentSource;
 import at.or.reder.media.io.PositionInputStream;
@@ -23,24 +24,24 @@ import at.or.reder.media.io.PositionInputStream;
  *
  * @author Wolfgang Reder
  */
-public final class EOIEntry extends AbstractJFIFEntry
+public final class SOIEntry extends AbstractJFIFEntry
 {
 
-  public static EOIEntry newInstance(PositionInputStream is,
+  public static SOIEntry newInstance(PositionInputStream is,
                                      int marker)
   {
-    return new EOIEntry(SegmentSourceFactory.instanceOf(is.getURL()),
+    return new SOIEntry(SegmentSourceFactory.instanceOf(is.getURL()),
                         marker,
                         is.getPosition() - 2);
   }
 
-  public EOIEntry(SegmentSource source,
+  public SOIEntry(SegmentSource source,
                   int marker,
                   long offset)
   {
     super(source,
           marker,
-          "EOI",
+          "SOI",
           0,
           offset,
           null);
@@ -49,7 +50,7 @@ public final class EOIEntry extends AbstractJFIFEntry
   @Override
   public int getPrefixLength()
   {
-    return 0;
+    return 2;
   }
 
 }

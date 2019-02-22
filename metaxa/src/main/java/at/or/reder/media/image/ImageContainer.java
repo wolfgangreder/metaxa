@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.media;
+package at.or.reder.media.image;
 
-import at.or.reder.meta.MetadataContainer;
+import at.or.reder.media.ContainerItemGroup;
+import at.or.reder.media.MediaContainer;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.List;
+import at.or.reder.media.meta.MetadataContainerItem;
 
 /**
  *
@@ -29,24 +31,32 @@ public interface ImageContainer extends MediaContainer
 
   public default BufferedImage getImage() throws IOException
   {
-    return getRepresentation(MediaRepresentation.MEDIA,
-                             BufferedImage.class).stream().
+    ImageMediaContainerItem item = getContainerItem(ContainerItemGroup.MEDIA,
+                                                    ImageMediaContainerItem.class).stream().
             findFirst().
             orElse(null);
+    if (item != null) {
+      return item.getImage();
+    }
+    return null;
   }
 
   public default BufferedImage getThumbnail() throws IOException
   {
-    return getRepresentation(MediaRepresentation.THUMBNAIL,
-                             BufferedImage.class).stream().
+    ImageMediaContainerItem item = getContainerItem(ContainerItemGroup.THUMBNAIL,
+                                                    ImageMediaContainerItem.class).stream().
             findFirst().
             orElse(null);
+    if (item != null) {
+      return item.getImage();
+    }
+    return null;
   }
 
-  public default List<MetadataContainer> getMetadataContainer() throws IOException
+  public default List<MetadataContainerItem> getMetadataContainer() throws IOException
   {
-    return getRepresentation(MediaRepresentation.METADATA,
-                             MetadataContainer.class);
+    return getContainerItem(ContainerItemGroup.METADATA,
+                            MetadataContainerItem.class);
   }
 
 }

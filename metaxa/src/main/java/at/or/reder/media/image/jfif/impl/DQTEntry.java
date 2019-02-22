@@ -13,44 +13,61 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.media.jfif.impl;
+package at.or.reder.media.image.jfif.impl;
 
-import at.or.reder.media.jfif.impl.AbstractJFIFEntry;
 import at.or.reder.media.io.SegmentSourceFactory;
 import at.or.reder.media.io.SegmentSource;
 import at.or.reder.media.io.PositionInputStream;
+import java.io.IOException;
 
 /**
  *
  * @author Wolfgang Reder
  */
-public final class SOIEntry extends AbstractJFIFEntry
+public final class DQTEntry extends AbstractJFIFEntry
 {
 
-  public static SOIEntry newInstance(PositionInputStream is,
-                                     int marker)
+  public static DQTEntry newInstance(PositionInputStream is,
+                                     int marker) throws IOException
   {
-    return new SOIEntry(SegmentSourceFactory.instanceOf(is.getURL()),
+    long offset = is.getPosition() - 2;
+    int length = loadShort(is) - 2;
+    if (length == -1) {
+      return null;
+    }
+    skipToEndOfEntryLength(is,
+                           length);
+    return new DQTEntry(SegmentSourceFactory.instanceOf(is.getURL()),
                         marker,
-                        is.getPosition() - 2);
+                        "DQT",
+                        length,
+                        offset);
   }
 
-  public SOIEntry(SegmentSource source,
+  public DQTEntry(SegmentSource source,
                   int marker,
+                  String name,
+                  int length,
                   long offset)
   {
     super(source,
           marker,
-          "SOI",
-          0,
+          name,
+          length,
           offset,
           null);
   }
 
   @Override
+  public long getDataOffset()
+  {
+    return super.getDataOffset(); //To change body of generated methods, choose Tools | Templates.
+  }
+
+  @Override
   public int getPrefixLength()
   {
-    return 2;
+    return super.getPrefixLength(); //To change body of generated methods, choose Tools | Templates.
   }
 
 }

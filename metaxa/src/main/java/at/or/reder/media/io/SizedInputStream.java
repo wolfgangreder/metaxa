@@ -79,34 +79,6 @@ public final class SizedInputStream extends InputStream
   }
 
   @Override
-  public int readNBytes(byte[] b,
-                        int off,
-                        int len) throws IOException
-  {
-    if (remaining <= 0) {
-      return 0;
-    }
-    int read = w.readNBytes(b,
-                            off,
-                            Math.min(remaining,
-                                     len));
-    remaining -= read;
-    return read;
-  }
-
-  @Override
-  public byte[] readNBytes(int len) throws IOException
-  {
-    if (remaining <= 0) {
-      return new byte[0];
-    }
-    byte[] tmp = w.readNBytes(Math.min(remaining,
-                                       len));
-    remaining -= tmp.length;
-    return tmp;
-  }
-
-  @Override
   public int read(byte[] b,
                   int off,
                   int len) throws IOException

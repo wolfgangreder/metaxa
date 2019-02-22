@@ -13,25 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.media.jfif.impl;
+package at.or.reder.media.meta.xmp;
 
-import at.or.reder.media.jfif.JFIFEntry;
-import at.or.reder.media.jfif.JFIFMarker;
+import at.or.reder.media.meta.MetadataProvider;
 
 /**
  *
  * @author Wolfgang Reder
  */
-public final class JFIFUtils
+public interface XMPMetadataProvider extends MetadataProvider
 {
-
-  public static boolean isExifEntry(JFIFEntry e)
-  {
-    return e != null && JFIFMarker.APP1.getMarker() == e.getMarker();
-  }
-
-  private JFIFUtils()
-  {
-  }
 
 }

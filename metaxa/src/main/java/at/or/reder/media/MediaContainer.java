@@ -15,6 +15,7 @@
  */
 package at.or.reder.media;
 
+import at.or.reder.media.meta.MetadataContainerItem;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
@@ -26,6 +27,13 @@ import java.util.List;
  */
 public interface MediaContainer
 {
+
+  /**
+   * Returns the Provider for this class
+   *
+   * @return providerclass
+   */
+  public MediaContainerProvider getProvider();
 
   /**
    * The origin of the media
@@ -49,7 +57,22 @@ public interface MediaContainer
    * @return
    * @throws IOException
    */
-  public <C> List<C> getRepresentation(MediaRepresentation representation,
-                                       Class<? extends C> representationClass) throws IOException;
+  public <C extends MediaContainerItem> List<MediaContainerItem> getContainerItem(ContainerItemGroup representation,
+                                                                                  Class<? extends C> representationClass) throws
+          IOException;
+
+  public default <C extends MediaContainerItem> C getMainMedia(Class<? extends C> representationClass) throws IOException
+  {
+    return (C) getContainerItem(ContainerItemGroup.MEDIA,
+                                representationClass).stream().
+            findFirst().
+            orElse(null);
+  }
+
+  public default List<MetadataContainerItem> getMetadata() throws IOException
+  {
+    return getContainerItem(ContainerItemGroup.METADATA,
+                            (Class<? extends C>) MetadataContainerItem.class);
+  }
 
 }

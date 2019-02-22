@@ -13,51 +13,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.media.jfif.impl;
+package at.or.reder.media.image.jfif.impl;
 
 import at.or.reder.media.io.SegmentSourceFactory;
 import at.or.reder.media.io.SegmentSource;
 import at.or.reder.media.io.PositionInputStream;
-import java.io.IOException;
 
 /**
  *
  * @author Wolfgang Reder
  */
-public class DHTEntry extends AbstractJFIFEntry
+public final class EOIEntry extends AbstractJFIFEntry
 {
 
-  public static DHTEntry newInstance(PositionInputStream is,
-                                     int marker) throws IOException
+  public static EOIEntry newInstance(PositionInputStream is,
+                                     int marker)
   {
-    long offset = is.getPosition() - 2;
-    int length = loadShort(is) - 2;
-    if (length == -1) {
-      return null;
-    }
-    skipToEndOfEntryLength(is,
-                           length);
-    return new DHTEntry(SegmentSourceFactory.instanceOf(is.getURL()),
+    return new EOIEntry(SegmentSourceFactory.instanceOf(is.getURL()),
                         marker,
-                        "DHT",
-                        length,
-                        offset,
-                        null);
+                        is.getPosition() - 2);
   }
 
-  public DHTEntry(SegmentSource source,
+  public EOIEntry(SegmentSource source,
                   int marker,
-                  String name,
-                  int length,
-                  long offset,
-                  String extensionName)
+                  long offset)
   {
     super(source,
           marker,
-          name,
-          length,
+          "EOI",
+          0,
           offset,
-          extensionName);
+          null);
+  }
+
+  @Override
+  public int getPrefixLength()
+  {
+    return 0;
   }
 
 }

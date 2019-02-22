@@ -13,15 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.media.jfif.impl;
+package at.or.reder.media.image.jfif.impl;
 
 import at.or.reder.media.MediaContainer;
 import at.or.reder.media.MediaContainerProvider;
 import at.or.reder.media.MimeTypes;
+import at.or.reder.media.image.jfif.JFIFEntry;
+import at.or.reder.media.image.jfif.JFIFMediaContainer;
 import at.or.reder.media.io.PositionInputStream;
-import at.or.reder.media.jfif.JFIFEntry;
-import at.or.reder.media.jfif.JFIFMediaContainer;
-import at.or.reder.media.util.Lookup;
 import at.or.reder.media.util.MediaUtils;
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -29,7 +28,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.List;
+import java.util.Collection;
+import org.openide.util.Lookup;
 import static org.testng.AssertJUnit.*;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -59,7 +59,7 @@ public class JFIFMediaContainerProviderNGTest
   @Test
   public void testLookup()
   {
-    List<MediaContainerProvider> providerList = Lookup.lookupAllInstances(MediaContainerProvider.class);
+    Collection<? extends MediaContainerProvider> providerList = Lookup.getDefault().lookupAll(MediaContainerProvider.class);
     assertNotNull(providerList);
     assertFalse(providerList.isEmpty());
     MediaContainerProvider provider = providerList.stream().
@@ -106,12 +106,14 @@ public class JFIFMediaContainerProviderNGTest
     File tmpFile = File.createTempFile("JFIFTest",
                                        ".jpg");
     tmpFile.deleteOnExit();
+
     try {
       JFIFMediaContainer jfifContainer = (JFIFMediaContainer) container;
       try (FileOutputStream fos = new FileOutputStream(tmpFile)) {
         for (JFIFEntry e : jfifContainer.getJFIFEntries()) {
           try (InputStream is = e.getInputStream()) {
-            is.transferTo(fos);
+            MediaUtils.transferTo(is,
+                                  fos);
           }
         }
       }

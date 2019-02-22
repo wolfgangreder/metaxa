@@ -13,12 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.media.jfif.impl;
+package at.or.reder.media.image.jfif.impl;
 
-import at.or.reder.media.io.SegmentSourceFactory;
 import at.or.reder.media.io.PositionInputStream;
-import at.or.reder.meta.container.jfif.impl.ExtensionSource;
-import at.or.reder.meta.container.jfif.impl.XMPMetaSource;
+import at.or.reder.media.io.SegmentSourceFactory;
 import java.io.IOException;
 import java.net.URL;
 
@@ -36,9 +34,11 @@ public final class APPxEntry extends AbstractJFIFEntry
       case 0xffe0:
         return newAPP0Entry(is);
       case 0xffe1:
-        return newAPP1Entry(is); // Exif,XMP
+        return newAPP1Entry(is,
+                            marker); // Exif,XMP
       case 0xffed:
-        return newAPP1Entry(is); // IPTC
+        return newAPP1Entry(is,
+                            marker); // IPTC
       default:
         throw new UnsupportedOperationException("Unexpected APPx Entry " + Integer.toHexString(marker));
     }
@@ -77,11 +77,11 @@ public final class APPxEntry extends AbstractJFIFEntry
                          extName,
                          is.getURL(),
                          offset,
-                         prefixSize,
-                         null);
+                         prefixSize);
   }
 
-  private static APPxEntry newAPP1Entry(PositionInputStream is) throws IOException
+  private static APPxEntry newAPP1Entry(PositionInputStream is,
+                                        int marker) throws IOException
   {
     long offset = is.getPosition() - 2;
     long relPrefixStart = 2;
@@ -98,22 +98,16 @@ public final class APPxEntry extends AbstractJFIFEntry
     length -= prefixSize;
     skipToEndOfEntryLength(is,
                            length);
-    ExtensionSource<?> extSource = null;
-    if (XMPMetaSource.JFIF_EXTENSION_NAME.equals(extName)) {
-      extSource = new XMPMetaSource();
-    }
-    return new APPxEntry(0xffe0,
+    return new APPxEntry(marker,
                          "APP1",
                          length,
                          extName,
                          is.getURL(),
                          offset,
-                         prefixSize,
-                         extSource);
+                         prefixSize);
   }
 
   private final int prefixSize;
-  private final ExtensionSource<?> extensionFactory;
 
   public APPxEntry(int marker,
                    String name,
@@ -121,8 +115,7 @@ public final class APPxEntry extends AbstractJFIFEntry
                    String extensionName,
                    URL url,
                    long offset,
-                   int prefixSize,
-                   ExtensionSource<?> extensionFactory)
+                   int prefixSize)
   {
     super(SegmentSourceFactory.instanceOf(url),
           marker,
@@ -131,22 +124,12 @@ public final class APPxEntry extends AbstractJFIFEntry
           offset,
           extensionName);
     this.prefixSize = prefixSize;
-    this.extensionFactory = extensionFactory;
   }
 
   @Override
   public int getPrefixLength()
   {
     return prefixSize + 2;
-  }
-
-  @Override
-  public <C> C getDataRepresentation(Class<? extends C> representationClass) throws IOException
-  {
-    if (extensionFactory != null && representationClass.isAssignableFrom(extensionFactory.getRepresentaionClass())) {
-      return representationClass.cast(extensionFactory.createExtension(getDataStream()));
-    }
-    return null;
   }
 
 }

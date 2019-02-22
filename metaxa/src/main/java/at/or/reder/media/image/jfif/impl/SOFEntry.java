@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.media.jfif.impl;
+package at.or.reder.media.image.jfif.impl;
 
-import at.or.reder.media.jfif.impl.AbstractJFIFEntry;
+import at.or.reder.media.image.jfif.impl.AbstractJFIFEntry;
 import at.or.reder.media.io.SegmentSourceFactory;
 import at.or.reder.media.io.SegmentSource;
 import at.or.reder.media.io.PositionInputStream;

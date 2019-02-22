@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.media.jfif;
+package at.or.reder.media.image.jfif;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -87,6 +87,15 @@ public enum JFIFMarker
   APP1(0xFFE1,
        "APP1",
        "APP1"),
+  APP2(0xFFE2,
+       "APP2",
+       "APP2"),
+  APP13(0xFFED,
+        "APP13",
+        "APP13"),
+  APP14(0xFFEE,
+        "APP14",
+        "APP14"),
   COM(0xFFFE,
       "COM",
       "Kommentare"),
@@ -105,10 +114,6 @@ public enum JFIFMarker
     for (JFIFMarker s : values()) {
       entryMap.put(s.marker,
                    s);
-    }
-    for (int i = 0xffe1; i < 0xfff0; ++i) {
-      entryMap.put(i,
-                   APP1);
     }
   }
 

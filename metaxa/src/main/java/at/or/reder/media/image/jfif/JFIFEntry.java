@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.media.jfif;
+package at.or.reder.media.image.jfif;
 
-import java.io.IOException;
-import java.io.InputStream;
+import at.or.reder.media.MediaChunk;
 
 /**
  * Represents a JFIF Marker Entry.
@@ -33,7 +32,7 @@ import java.io.InputStream;
  *
  * @author Wolfgang Reder
  */
-public interface JFIFEntry extends Comparable<JFIFEntry>
+public interface JFIFEntry extends MediaChunk, Comparable<JFIFEntry>
 {
 
   /**
@@ -42,37 +41,6 @@ public interface JFIFEntry extends Comparable<JFIFEntry>
    * @return marker byte
    */
   public int getMarker();
-
-  /**
-   * Name of the Marker (e.g. APP0,SOI,...)
-   *
-   * @return Name of Marker
-   */
-  public String getName();
-
-  /**
-   * Datalength of the Segment. Net length of data (without length,externsionname).
-   *
-   * @return length
-   */
-  public int getLength();
-
-  /**
-   * Name of the APPx extension (ex. Exif,....)
-   *
-   * @return extension Name
-   */
-  public String getExtensionName();
-
-  /**
-   * Datastream for the Segment <em>with</em> marker and length.
-   *
-   * @return Stream with data.
-   * @throws java.io.IOException on IOError
-   */
-  public InputStream getInputStream() throws IOException;
-
-  public InputStream getDataStream() throws IOException;
 
   /**
    * Offset of Segment with the original stream
@@ -89,11 +57,6 @@ public interface JFIFEntry extends Comparable<JFIFEntry>
   public default int getPrefixLength()
   {
     return 4;
-  }
-
-  public default <C> C getDataRepresentation(Class<? extends C> representationClass) throws IOException
-  {
-    return null;
   }
 
 }

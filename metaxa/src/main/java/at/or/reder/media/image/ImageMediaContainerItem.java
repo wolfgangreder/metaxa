@@ -13,18 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.media.jfif;
+package at.or.reder.media.image;
 
-import at.or.reder.media.MediaContainer;
-import java.util.List;
+import at.or.reder.media.MediaContainerItem;
+import java.awt.image.BufferedImage;
 
 /**
  *
  * @author Wolfgang Reder
  */
-public interface JFIFMediaContainer extends MediaContainer
+public interface ImageMediaContainerItem extends MediaContainerItem
 {
 
-  public List<JFIFEntry> getJFIFEntries();
+  public default BufferedImage getImage()
+  {
+    return getItem(BufferedImage.class);
+  }
 
 }

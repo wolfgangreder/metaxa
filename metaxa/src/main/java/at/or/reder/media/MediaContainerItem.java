@@ -16,12 +16,15 @@
 package at.or.reder.media;
 
 /**
+ * Class representing an Item in the Mediagroup
  *
  * @author Wolfgang Reder
  */
-public enum MediaRepresentation
+public interface MediaContainerItem
 {
-  MEDIA,
-  THUMBNAIL,
-  METADATA;
+
+  public ContainerItemGroup getGroup();
+
+  public <C> C getItem(Class<? extends C> itemClass);
+
 }

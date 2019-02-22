@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.media.jfif.impl;
+package at.or.reder.media.image.jfif.impl;
 
-import at.or.reder.media.jfif.JFIFMarker;
-import at.or.reder.media.jfif.JFIFEntry;
+import at.or.reder.media.image.jfif.JFIFMarker;
+import at.or.reder.media.image.jfif.JFIFEntry;
 import at.or.reder.media.io.PositionInputStream;
 import at.or.reder.media.io.SegmentSource;
 import java.io.IOException;
