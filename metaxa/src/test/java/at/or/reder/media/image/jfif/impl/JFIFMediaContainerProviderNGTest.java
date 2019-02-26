@@ -15,13 +15,20 @@
  */
 package at.or.reder.media.image.jfif.impl;
 
+import at.or.reder.media.ContainerItemGroup;
 import at.or.reder.media.MediaContainer;
 import at.or.reder.media.MediaContainerProvider;
 import at.or.reder.media.MimeTypes;
 import at.or.reder.media.image.jfif.JFIFEntry;
 import at.or.reder.media.image.jfif.JFIFMediaContainer;
 import at.or.reder.media.io.PositionInputStream;
+import at.or.reder.media.meta.MetadataContainerItem;
+import at.or.reder.media.meta.xmp.XMPMetadataContainerItem;
 import at.or.reder.media.util.MediaUtils;
+import com.adobe.internal.xmp.XMPConst;
+import com.adobe.internal.xmp.XMPMeta;
+import com.adobe.internal.xmp.options.PropertyOptions;
+import com.adobe.internal.xmp.properties.XMPProperty;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,6 +36,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Collection;
+import java.util.List;
 import org.openide.util.Lookup;
 import static org.testng.AssertJUnit.*;
 import org.testng.annotations.BeforeClass;
@@ -143,8 +151,44 @@ public class JFIFMediaContainerProviderNGTest
   }
 
   @Test
-  public void testCreateContainer_File() throws Exception
+  public void testCreateContainer_Meta() throws Exception
   {
+    URL u = getClass().getResource("/test0001.jpg");
+    MediaContainer container = new JFIFMediaContainerProvider().createContainer(u);
+    assertNotNull(container);
+    assertTrue(container instanceof JFIFMediaContainer);
+    List<? extends MetadataContainerItem> metaList = container.getMetadata();
+    assertNotNull(metaList);
+    assertEquals(1,
+                 metaList.size());
+    metaList = container.findContainerItem(ContainerItemGroup.METADATA,
+                                           XMPMetadataContainerItem.class);
+    assertNotNull(metaList);
+    assertEquals(1,
+                 metaList.size());
+    XMPMetadataContainerItem xmpData = container.getContainerItem(ContainerItemGroup.METADATA,
+                                                                  XMPMetadataContainerItem.class);
+    assertNotNull(xmpData);
+    XMPMeta xp = xmpData.getItem(XMPMeta.class);
+    assertNotNull(xp);
+    String s = xmpData.getItem(String.class);
+    assertNotNull(s);
+    XMPProperty prop = xp.getProperty(XMPConst.NS_DC,
+                                      "subject");
+
+    PropertyOptions opt = prop.getOptions();
+    if (opt.isArray()) {
+      int arraySize = xp.countArrayItems(XMPConst.NS_DC,
+                                         "subject");
+      for (int i = 1; i <= arraySize; ++i) {
+        XMPProperty item = xp.getArrayItem(XMPConst.NS_DC,
+                                           "subject",
+                                           i);
+        String language = item.getLanguage();
+        System.out.println(item);
+      }
+      System.err.println("subject is array");
+    }
   }
 
 }

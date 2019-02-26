@@ -19,6 +19,7 @@ import at.or.reder.media.ContainerItemGroup;
 import at.or.reder.media.MediaContainerItem;
 import at.or.reder.media.MediaContainerProvider;
 import at.or.reder.media.MimeTypes;
+import at.or.reder.media.MutableMediaContainer;
 import at.or.reder.media.image.jfif.JFIFEntry;
 import at.or.reder.media.image.jfif.JFIFMediaContainer;
 import at.or.reder.media.meta.MetadataContainerItem;
@@ -29,7 +30,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  *
@@ -88,12 +88,16 @@ final class JFIFMediaContainerImpl implements JFIFMediaContainer
     throw new UnsupportedOperationException();
   }
 
-  private <C extends MetadataContainerItem> List<MetadataContainerItem> metaRepresentation(Class<? extends C> representationClass)
+  @SuppressWarnings({"unchecked"})
+  private <C extends MetadataContainerItem> List<C> metaRepresentation(Class<? extends MetadataContainerItem> representationClass)
           throws IOException
   {
-    List<MetadataContainerItem> tmp = metaItems.stream().
-            filter(representationClass::isInstance).
-            collect(Collectors.toList());
+    List<C> tmp = new ArrayList<>();
+    for (MetadataContainerItem i : metaItems) {
+      if (representationClass.isInstance(i)) {
+        tmp.add((C) i);
+      }
+    }
     return tmp;
   }
 
@@ -104,8 +108,8 @@ final class JFIFMediaContainerImpl implements JFIFMediaContainer
   }
 
   @Override
-  public <C extends MediaContainerItem> List<MediaContainerItem> getContainerItem(ContainerItemGroup representation,
-                                                                                  Class<? extends C> representationClass) throws
+  public <C extends MediaContainerItem> List<? extends C> findContainerItem(ContainerItemGroup representation,
+                                                                            Class<C> representationClass) throws
           IOException
   {
     switch (representation) {
@@ -113,13 +117,20 @@ final class JFIFMediaContainerImpl implements JFIFMediaContainer
         return mediaRepresentation(representationClass);
       case METADATA:
         if (MetadataContainerItem.class.isAssignableFrom(representationClass)) {
-          return metaRepresentation(MetadataContainerItem.class.cast(representationClass));
+          Class<? extends MetadataContainerItem> clazz = representationClass.asSubclass(MetadataContainerItem.class);
+          return metaRepresentation(clazz);
         }
       case THUMBNAIL:
         return thumbnailRepresentation(representationClass);
       default:
         return Collections.emptyList();
     }
+  }
+
+  @Override
+  public MutableMediaContainer createMutable() throws IOException
+  {
+    return new MutableJFIFMediaContainer(this);
   }
 
 }

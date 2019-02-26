@@ -16,6 +16,7 @@
 package at.or.reder.media.meta.xmp.impl;
 
 import at.or.reder.media.MediaChunk;
+import at.or.reder.media.meta.KeywordContainer;
 import at.or.reder.media.meta.xmp.XMPMetadataContainerItem;
 import at.or.reder.media.util.MediaUtils;
 import com.adobe.internal.xmp.XMPException;
@@ -23,6 +24,7 @@ import com.adobe.internal.xmp.XMPMeta;
 import com.adobe.internal.xmp.XMPMetaFactory;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.ref.SoftReference;
 import java.util.logging.Level;
 
@@ -47,9 +49,29 @@ public class XMPMetadataContainerItemImpl implements XMPMetadataContainerItem
     if (result == null && chunk != null) {
       try (InputStream is = chunk.getDataStream()) {
         result = XMPMetaFactory.parse(is);
+        meta = new SoftReference<>(result);
       }
     }
     return result;
+  }
+
+  private KeywordContainer scanKeywords(XMPMeta meta)
+  {
+    return null;
+  }
+
+  @Override
+  public void storeTo(OutputStream os) throws IOException
+  {
+    try {
+      XMPMetaFactory.serialize(loadMeta(),
+                               os);
+    } catch (XMPException ex) {
+      MediaUtils.LOGGER.log(Level.SEVERE,
+                            null,
+                            ex);
+      throw new IOException(ex);
+    }
   }
 
   @Override
@@ -62,6 +84,10 @@ public class XMPMetadataContainerItemImpl implements XMPMetadataContainerItem
         XMPMeta m = loadMeta();
         return itemClass.cast(XMPMetaFactory.serializeToString(m,
                                                                null));
+      } else if (KeywordContainer.class == itemClass) {
+        return itemClass.cast(scanKeywords(loadMeta()));
+      } else if (MediaChunk.class.isAssignableFrom(itemClass)) {
+        return itemClass.cast(chunk);
       }
     } catch (IOException | XMPException ex) {
       MediaUtils.LOGGER.log(Level.SEVERE,

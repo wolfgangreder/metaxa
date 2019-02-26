@@ -17,6 +17,8 @@ package at.or.reder.media.meta;
 
 import at.or.reder.media.ContainerItemGroup;
 import at.or.reder.media.MediaContainerItem;
+import java.io.IOException;
+import java.io.OutputStream;
 import org.w3c.dom.Node;
 
 /**
@@ -36,5 +38,7 @@ public interface MetadataContainerItem extends MediaContainerItem
   {
     return getItem(Node.class);
   }
+
+  public void storeTo(OutputStream os) throws IOException;
 
 }

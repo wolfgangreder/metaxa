@@ -49,7 +49,8 @@ public interface MediaContainer
   public String getMIMEType();
 
   /**
-   * Get a representaion of the Media.The Representation can be,for example a {@link java.awt.image.Image} or a {@link at.or.reder.meta.elements.MetaDataContainer}
+   * Get a representaion of the Media.The Representation can be,for example a {@link java.awt.image.Image} or a
+   * {@link at.or.reder.meta.elements.MetaDataContainer}
    *
    * @param <C>
    * @param representation
@@ -57,22 +58,33 @@ public interface MediaContainer
    * @return
    * @throws IOException
    */
-  public <C extends MediaContainerItem> List<MediaContainerItem> getContainerItem(ContainerItemGroup representation,
-                                                                                  Class<? extends C> representationClass) throws
+  public <C extends MediaContainerItem> List<? extends C> findContainerItem(ContainerItemGroup representation,
+                                                                            Class<C> representationClass) throws
           IOException;
 
   public default <C extends MediaContainerItem> C getMainMedia(Class<? extends C> representationClass) throws IOException
   {
-    return (C) getContainerItem(ContainerItemGroup.MEDIA,
-                                representationClass).stream().
+    return (C) findContainerItem(ContainerItemGroup.MEDIA,
+                                 representationClass).stream().
             findFirst().
             orElse(null);
   }
 
-  public default List<MetadataContainerItem> getMetadata() throws IOException
+  public default List<? extends MetadataContainerItem> getMetadata() throws IOException
   {
-    return getContainerItem(ContainerItemGroup.METADATA,
-                            (Class<? extends C>) MetadataContainerItem.class);
+    return findContainerItem(ContainerItemGroup.METADATA,
+                             MetadataContainerItem.class);
   }
+
+  public default <C extends MediaContainerItem> C getContainerItem(ContainerItemGroup itemGroup,
+                                                                   Class<C> representationClass) throws IOException
+  {
+    return findContainerItem(itemGroup,
+                             representationClass).stream().
+            findFirst().
+            orElse(null);
+  }
+
+  public MutableMediaContainer createMutable() throws IOException;
 
 }

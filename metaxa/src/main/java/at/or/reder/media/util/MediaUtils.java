@@ -90,7 +90,9 @@ public final class MediaUtils
   {
     byte[] buffer = new byte[8192];
     int read;
-    while ((read = is.read(buffer)) > 0) {
+    while ((read = is.read(buffer,
+                           0,
+                           buffer.length)) >= 0) {
       os.write(buffer,
                0,
                read);

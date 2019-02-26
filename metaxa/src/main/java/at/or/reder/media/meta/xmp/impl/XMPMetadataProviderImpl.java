@@ -19,9 +19,14 @@ import at.or.reder.media.MediaChunk;
 import at.or.reder.media.meta.MetadataContainerItem;
 import at.or.reder.media.meta.MetadataProvider;
 import at.or.reder.media.meta.xmp.XMPMetadataProvider;
+import at.or.reder.media.util.MediaUtils;
 import com.adobe.internal.xmp.XMPConst;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
+import java.util.logging.Level;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -32,11 +37,37 @@ import org.openide.util.lookup.ServiceProvider;
 public final class XMPMetadataProviderImpl implements XMPMetadataProvider
 {
 
+  private final String xmpversion;
+
+  public XMPMetadataProviderImpl()
+  {
+    String v = null;
+    URL u = getClass().getClassLoader().getResource("META-INF/maven/com.adobe.xmp/xmpcore/pom.properties");
+    if (u != null) {
+      Properties props = new Properties();
+      try (InputStream is = u.openStream()) {
+        props.load(is);
+        v = props.getProperty("version");
+      } catch (Throwable th) {
+      }
+    }
+    xmpversion = v;
+    if (xmpversion != null) {
+      MediaUtils.LOGGER.log(Level.CONFIG,
+                            () -> "Found xmpcore version " + xmpversion);
+    } else {
+      MediaUtils.LOGGER.log(Level.CONFIG,
+                            "xmpcore not found");
+    }
+  }
+
   @Override
   public List<MetadataContainerItem> extractItems(MediaChunk item)
   {
-    if (XMPConst.NS_XMP.equals(item.getExtensionName())) {
-
+    if (xmpversion != null) {
+      if (XMPConst.NS_XMP.equals(item.getExtensionName())) {
+        return Collections.singletonList(new XMPMetadataContainerItemImpl(item));
+      }
     }
     return Collections.emptyList();
   }

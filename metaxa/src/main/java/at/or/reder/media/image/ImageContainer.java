@@ -19,8 +19,6 @@ import at.or.reder.media.ContainerItemGroup;
 import at.or.reder.media.MediaContainer;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.List;
-import at.or.reder.media.meta.MetadataContainerItem;
 
 /**
  *
@@ -31,7 +29,7 @@ public interface ImageContainer extends MediaContainer
 
   public default BufferedImage getImage() throws IOException
   {
-    ImageMediaContainerItem item = getContainerItem(ContainerItemGroup.MEDIA,
+    ImageMediaContainerItem item = findContainerItem(ContainerItemGroup.MEDIA,
                                                     ImageMediaContainerItem.class).stream().
             findFirst().
             orElse(null);
@@ -43,7 +41,7 @@ public interface ImageContainer extends MediaContainer
 
   public default BufferedImage getThumbnail() throws IOException
   {
-    ImageMediaContainerItem item = getContainerItem(ContainerItemGroup.THUMBNAIL,
+    ImageMediaContainerItem item = findContainerItem(ContainerItemGroup.THUMBNAIL,
                                                     ImageMediaContainerItem.class).stream().
             findFirst().
             orElse(null);
@@ -51,12 +49,6 @@ public interface ImageContainer extends MediaContainer
       return item.getImage();
     }
     return null;
-  }
-
-  public default List<MetadataContainerItem> getMetadataContainer() throws IOException
-  {
-    return getContainerItem(ContainerItemGroup.METADATA,
-                            MetadataContainerItem.class);
   }
 
 }

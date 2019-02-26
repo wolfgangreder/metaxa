@@ -13,20 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.meta.container.jfif.impl;
+package at.or.reder.media.meta;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.util.List;
 
 /**
  *
  * @author Wolfgang Reder
  */
-public interface ExtensionSource<C>
+public interface KeywordContainer
 {
 
-  public C createExtension(InputStream is) throws IOException;
-
-  public Class<? extends C> getRepresentaionClass();
+  public List<Keyword> getKeywords();
 
 }

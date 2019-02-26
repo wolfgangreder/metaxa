@@ -58,14 +58,42 @@ public final class MediaContainerFactory
     }
   }
 
+  private static MediaContainerProvider findProvider(File file)
+  {
+    for (MediaContainerProvider p : getInstalledMediaContainerProvider()) {
+      if (p.isValidFor(file)) {
+        return p;
+      }
+    }
+    return null;
+  }
+
+  private static MediaContainerProvider findProvider(URL file)
+  {
+    for (MediaContainerProvider p : getInstalledMediaContainerProvider()) {
+      if (p.isValidFor(file)) {
+        return p;
+      }
+    }
+    return null;
+  }
+
   public static MediaContainer createContainer(URL url) throws IOException
   {
-    throw new UnsupportedOperationException();
+    MediaContainerProvider provider = findProvider(url);
+    if (provider == null) {
+      throw new IOException("Cannot find provider");
+    }
+    return provider.createContainer(url);
   }
 
   public static MediaContainer createContainer(File file) throws IOException
   {
-    throw new UnsupportedOperationException();
+    MediaContainerProvider provider = findProvider(file);
+    if (provider == null) {
+      throw new IOException("Cannot find provider");
+    }
+    return provider.createContainer(file);
   }
 
   private MediaContainerFactory()

@@ -13,23 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.meta;
+package at.or.reder.media.meta;
 
 import java.util.List;
-import at.or.reder.meta.MetadataSpecification;
-import at.or.reder.meta.elements.MetaElement;
 
 /**
  *
  * @author Wolfgang Reder
  */
-public interface MetadataContainer
+public interface Keyword
 {
 
-  public MetadataSpecification getSpecification();
+  public List<MetadataContainerItem> getSources();
 
-  public <M> M getRawDataModel(Class<? extends M> metaModel);
+  public Keyword getParent();
 
-  public <C extends MetaElement> List<C> getElements(Class<? extends C> infoClass);
+  public String getLabel();
+
+  public List<Keyword> getSubkeys();
 
 }

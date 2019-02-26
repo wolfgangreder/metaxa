@@ -15,7 +15,7 @@
  */
 package at.or.reder.media;
 
-import at.or.reder.meta.MetadataContainer;
+import at.or.reder.media.meta.MetadataContainerItem;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
@@ -47,13 +47,12 @@ public interface MutableMediaContainer extends MediaContainer
    *
    * @return Metadata removed.
    */
-  public List<MetadataContainer> removeMetadata();
+  public List<MetadataContainerItem> removeMetadata();
 
   public List<BufferedImage> removeThumbnails();
 
   /**
-   * Add a new Item to the container.
-   * If only one instance of this item can be stored in the container (e.g. main image in jpeg),
+   * Add a new Item to the container. If only one instance of this item can be stored in the container (e.g. main image in jpeg),
    * the old content is returned.
    *
    * @param <C> Item class
