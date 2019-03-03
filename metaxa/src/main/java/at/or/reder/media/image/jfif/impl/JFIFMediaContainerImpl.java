@@ -21,10 +21,19 @@ import at.or.reder.media.MediaContainerProvider;
 import at.or.reder.media.MimeTypes;
 import at.or.reder.media.MutableMediaContainer;
 import at.or.reder.media.image.jfif.JFIFEntry;
+import at.or.reder.media.image.jfif.JFIFMarker;
 import at.or.reder.media.image.jfif.JFIFMediaContainer;
+import at.or.reder.media.meta.DefaultImageGeometrie;
+import at.or.reder.media.meta.ImageGeometrie;
 import at.or.reder.media.meta.MetadataContainerItem;
+import at.or.reder.media.meta.PixelUnit;
+import java.awt.Dimension;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -42,11 +51,12 @@ final class JFIFMediaContainerImpl implements JFIFMediaContainer
   private final List<JFIFEntry> entries;
   private final JFIFMediaContainerProvider provider;
   private final List<MetadataContainerItem> metaItems;
+  private final ImageGeometrie geo;
 
   public JFIFMediaContainerImpl(JFIFMediaContainerProvider provider,
                                 URL url,
                                 Collection<? extends JFIFEntry> entries,
-                                Collection<? extends MetadataContainerItem> metaItems)
+                                Collection<? extends MetadataContainerItem> metaItems) throws IOException
   {
     this.provider = Objects.requireNonNull(provider,
                                            "provider is null");
@@ -57,6 +67,59 @@ final class JFIFMediaContainerImpl implements JFIFMediaContainer
     } else {
       this.metaItems = Collections.unmodifiableList(new ArrayList<>(metaItems));
     }
+    APPxEntry app0 = findEntry(JFIFMarker.APP0,
+                               APPxEntry.class);
+    SOFEntry sof = findEntry(SOFEntry.class);
+    Dimension dim = sof.getImageDimension();
+    PixelUnit unit = PixelUnit.NONE;
+    int xdensity = -1;
+    int ydensity = -1;
+    if (app0 != null) {
+      ByteBuffer buffer = ByteBuffer.allocate(app0.getLength());
+      buffer.order(ByteOrder.BIG_ENDIAN);
+      try (ReadableByteChannel ch = Channels.newChannel(app0.getDataStream())) {
+        ch.read(buffer);
+        buffer.rewind();
+        short version = buffer.getShort();
+        switch (buffer.get()) {
+          case 1:
+            unit = PixelUnit.DPI;
+            break;
+          case 2:
+            unit = PixelUnit.DPICM;
+            break;
+          default:
+            unit = PixelUnit.NONE;
+        }
+        xdensity = buffer.getShort() & 0xffff;
+        ydensity = buffer.getShort() & 0xffff;
+      }
+    }
+    geo = new DefaultImageGeometrie(unit,
+                                    xdensity,
+                                    ydensity,
+                                    dim.width,
+                                    dim.height);
+  }
+
+  private <C extends JFIFEntry> C findEntry(JFIFMarker marker,
+                                            Class<? extends C> clazz)
+  {
+    return entries.stream().
+            filter(clazz::isInstance).
+            filter((JFIFEntry e) -> e.getMarker() == marker.getMarker()).
+            map(clazz::cast).
+            findFirst().
+            orElse(null);
+  }
+
+  private <C extends JFIFEntry> C findEntry(Class<? extends C> clazz)
+  {
+    return entries.stream().
+            filter(clazz::isInstance).
+            map(clazz::cast).
+            findFirst().
+            orElse(null);
   }
 
   @Override
@@ -131,6 +194,12 @@ final class JFIFMediaContainerImpl implements JFIFMediaContainer
   public MutableMediaContainer createMutable() throws IOException
   {
     return new MutableJFIFMediaContainer(this);
+  }
+
+  @Override
+  public ImageGeometrie getImageGeometrie()
+  {
+    return geo;
   }
 
 }

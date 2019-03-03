@@ -15,11 +15,15 @@
  */
 package at.or.reder.media.image.jfif.impl;
 
-import at.or.reder.media.image.jfif.impl.AbstractJFIFEntry;
-import at.or.reder.media.io.SegmentSourceFactory;
-import at.or.reder.media.io.SegmentSource;
 import at.or.reder.media.io.PositionInputStream;
+import at.or.reder.media.io.SegmentSource;
+import at.or.reder.media.io.SegmentSourceFactory;
+import java.awt.Dimension;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 
 /**
  *
@@ -97,10 +101,22 @@ public class SOFEntry extends AbstractJFIFEntry
           extensionName);
   }
 
-  @Override
-  public int getPrefixLength()
+  public Dimension getImageDimension() throws IOException
   {
-    return super.getPrefixLength(); //To change body of generated methods, choose Tools | Templates.
+    ByteBuffer buffer = ByteBuffer.allocate(getLength());
+    buffer.order(ByteOrder.BIG_ENDIAN);
+    try (ReadableByteChannel channel = Channels.newChannel(getDataStream())) {
+      int read = channel.read(buffer);
+      if (read != getLength()) {
+        throw new IOException("Cannot read SOFEntry");
+      }
+      buffer.rewind();
+      byte precision = buffer.get();
+      int height = buffer.getShort() & 0xffff;
+      int width = buffer.getShort() & 0xffff;
+      return new Dimension(width,
+                           height);
+    }
   }
 
 }

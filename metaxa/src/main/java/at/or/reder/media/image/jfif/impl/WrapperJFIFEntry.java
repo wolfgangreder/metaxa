@@ -17,8 +17,6 @@ package at.or.reder.media.image.jfif.impl;
 
 import at.or.reder.media.MediaChunk;
 import at.or.reder.media.image.jfif.JFIFMarker;
-import java.io.IOException;
-import java.io.InputStream;
 
 /**
  *
@@ -32,51 +30,35 @@ final class WrapperJFIFEntry extends AbstractJFIFEntry
   private static int getLength(JFIFMarker marker,
                                MediaChunk dataChunk)
   {
-
+    return dataChunk.getLength();
   }
 
-  private static int getOffset(JFIFMarker marker,
-                               String extensionName)
+  private static long getDataOffset(JFIFMarker marker,
+                                    MediaChunk dataChunk,
+                                    String extensionName)
   {
-
+    if (dataChunk instanceof AbstractJFIFEntry) {
+      return ((AbstractJFIFEntry) dataChunk).getDataOffset();
+    } else {
+      return 0;
+    }
   }
 
   public WrapperJFIFEntry(JFIFMarker marker,
                           String extensionName,
                           MediaChunk dataChunk)
   {
+
     super(null,
           marker.getMarker(),
           marker.getName(),
           getLength(marker,
                     dataChunk),
-          getOffset(marker,
-                    extensionName),
+          getDataOffset(marker,
+                        dataChunk,
+                        extensionName),
           extensionName);
-  }
-
-  @Override
-  public long getDataOffset()
-  {
-    return super.getDataOffset(); //To change body of generated methods, choose Tools | Templates.
-  }
-
-  @Override
-  public int getPrefixLength()
-  {
-    return super.getPrefixLength(); //To change body of generated methods, choose Tools | Templates.
-  }
-
-  @Override
-  public InputStream getDataStream() throws IOException
-  {
-    return super.getDataStream(); //To change body of generated methods, choose Tools | Templates.
-  }
-
-  @Override
-  public InputStream getInputStream() throws IOException
-  {
-    return super.getInputStream(); //To change body of generated methods, choose Tools | Templates.
+    this.dataChunk = dataChunk;
   }
 
 }

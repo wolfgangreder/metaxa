@@ -15,6 +15,7 @@
  */
 package at.or.reder.media;
 
+import at.or.reder.media.meta.ImageGeometrie;
 import at.or.reder.media.meta.MetadataContainerItem;
 import java.io.IOException;
 import java.net.URL;
@@ -86,5 +87,7 @@ public interface MediaContainer
   }
 
   public MutableMediaContainer createMutable() throws IOException;
+
+  public ImageGeometrie getImageGeometrie();
 
 }

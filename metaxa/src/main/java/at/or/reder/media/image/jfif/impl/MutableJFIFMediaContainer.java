@@ -22,6 +22,7 @@ import at.or.reder.media.MimeTypes;
 import at.or.reder.media.MutableMediaContainer;
 import at.or.reder.media.image.jfif.JFIFEntry;
 import at.or.reder.media.image.jfif.JFIFMediaContainer;
+import at.or.reder.media.meta.ImageGeometrie;
 import at.or.reder.media.meta.MetadataContainerItem;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -137,6 +138,12 @@ final class MutableJFIFMediaContainer implements MutableMediaContainer
   public MutableMediaContainer createMutable()
   {
     return new MutableJFIFMediaContainer(this);
+  }
+
+  @Override
+  public ImageGeometrie getImageGeometrie()
+  {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
 }

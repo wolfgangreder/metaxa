@@ -15,6 +15,7 @@
  */
 package at.or.reder.media.image.jfif.impl;
 
+import at.or.reder.media.image.jfif.JFIFMarker;
 import at.or.reder.media.io.PositionInputStream;
 import at.or.reder.media.io.SegmentSourceFactory;
 import java.io.IOException;
@@ -34,10 +35,13 @@ public final class APPxEntry extends AbstractJFIFEntry
       case 0xffe0:
         return newAPP0Entry(is);
       case 0xffe1:
-        return newAPP1Entry(is,
+        return newAPPxEntry(is,
                             marker); // Exif,XMP
+      case 0xffe2:
+        return newAPPxEntry(is,
+                            marker); // ICC_PROFILE
       case 0xffed:
-        return newAPP1Entry(is,
+        return newAPPxEntry(is,
                             marker); // IPTC
       default:
         throw new UnsupportedOperationException("Unexpected APPx Entry " + Integer.toHexString(marker));
@@ -80,7 +84,13 @@ public final class APPxEntry extends AbstractJFIFEntry
                          prefixSize);
   }
 
-  private static APPxEntry newAPP1Entry(PositionInputStream is,
+  private static String getSegmentName(int marker)
+  {
+    int tmp = marker - JFIFMarker.APP0.getMarker();
+    return "APP" + Integer.toString(tmp);
+  }
+
+  private static APPxEntry newAPPxEntry(PositionInputStream is,
                                         int marker) throws IOException
   {
     long offset = is.getPosition() - 2;
@@ -99,7 +109,7 @@ public final class APPxEntry extends AbstractJFIFEntry
     skipToEndOfEntryLength(is,
                            length);
     return new APPxEntry(marker,
-                         "APP1",
+                         getSegmentName(marker),
                          length,
                          extName,
                          is.getURL(),
