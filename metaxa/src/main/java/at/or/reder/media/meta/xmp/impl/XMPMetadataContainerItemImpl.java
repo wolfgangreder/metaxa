@@ -27,6 +27,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.ref.SoftReference;
 import java.util.logging.Level;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  *
@@ -60,6 +67,20 @@ public class XMPMetadataContainerItemImpl implements XMPMetadataContainerItem
     return null;
   }
 
+  private Node createDOMTree() throws IOException, SAXException, ParserConfigurationException
+  {
+    DocumentBuilderFactory factory = DocumentBuilderFactory.newDefaultInstance();
+    DocumentBuilder builder = factory.newDocumentBuilder();
+    try (InputStream is = chunk.getDataStream()) {
+      Document doc = builder.parse(is);
+      NodeList nodeList = doc.getElementsByTagName("xmpmeta");
+      if (nodeList.getLength() > 0) {
+        return nodeList.item(0);
+      }
+    }
+    return null;
+  }
+
   @Override
   public void storeTo(OutputStream os) throws IOException
   {
@@ -88,8 +109,10 @@ public class XMPMetadataContainerItemImpl implements XMPMetadataContainerItem
         return itemClass.cast(scanKeywords(loadMeta()));
       } else if (MediaChunk.class.isAssignableFrom(itemClass)) {
         return itemClass.cast(chunk);
+      } else if (Node.class.isAssignableFrom(itemClass)) {
+        return itemClass.cast(createDOMTree());
       }
-    } catch (IOException | XMPException ex) {
+    } catch (IOException | XMPException | SAXException | ParserConfigurationException ex) {
       MediaUtils.LOGGER.log(Level.SEVERE,
                             null,
                             ex);

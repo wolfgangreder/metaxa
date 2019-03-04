@@ -16,17 +16,16 @@
 package at.or.reder.media.image.jfif.impl;
 
 import at.or.reder.media.ContainerItemGroup;
+import static at.or.reder.media.ContainerItemGroup.MEDIA;
+import static at.or.reder.media.ContainerItemGroup.METADATA;
+import static at.or.reder.media.ContainerItemGroup.THUMBNAIL;
 import at.or.reder.media.MediaContainerItem;
-import at.or.reder.media.MediaContainerProvider;
-import at.or.reder.media.MimeTypes;
 import at.or.reder.media.MutableMediaContainer;
 import at.or.reder.media.image.jfif.JFIFEntry;
 import at.or.reder.media.image.jfif.JFIFMediaContainer;
-import at.or.reder.media.meta.ImageGeometrie;
 import at.or.reder.media.meta.MetadataContainerItem;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,33 +34,37 @@ import java.util.stream.Collectors;
  *
  * @author Wolfgang Reder
  */
-final class MutableJFIFMediaContainer implements MutableMediaContainer
+final class MutableJFIFMediaContainer extends JFIFMediaContainerImpl implements MutableMediaContainer, JFIFMediaContainer
 {
 
   private final JFIFMediaContainer jfifContainer;
-  private final List<JFIFEntry> originalEntries = new ArrayList<>();
   private final List<JFIFEntry> toDelete = new ArrayList<>();
   private final List<JFIFEntry> toInsert = new ArrayList<>();
-  private final List<MetadataContainerItem> metaItems = new ArrayList<>();
 
   public MutableJFIFMediaContainer(JFIFMediaContainer jfifContainer) throws IOException
   {
+    super((JFIFMediaContainerProvider) jfifContainer.getProvider(),
+          jfifContainer.getMediaURL(),
+          jfifContainer.getJFIFEntries(),
+          jfifContainer.getMetadata());
     this.jfifContainer = jfifContainer;
-    originalEntries.addAll(jfifContainer.getJFIFEntries());
-    this.metaItems.addAll(jfifContainer.getMetadata());
   }
 
-  private MutableJFIFMediaContainer(MutableJFIFMediaContainer mc)
+  private MutableJFIFMediaContainer(MutableJFIFMediaContainer mc) throws IOException
   {
+    super((JFIFMediaContainerProvider) mc.getProvider(),
+          mc.getMediaURL(),
+          mc.getJFIFEntries(),
+          mc.getMetadata());
     this.jfifContainer = mc.jfifContainer;
-    this.originalEntries.addAll(jfifContainer.getJFIFEntries());
     this.toDelete.addAll(mc.toDelete);
     this.toInsert.addAll(mc.toInsert);
   }
 
-  public List<JFIFEntry> getEntries()
+  @Override
+  public List<JFIFEntry> getJFIFEntries()
   {
-    List<JFIFEntry> result = originalEntries.stream().
+    List<JFIFEntry> result = super.getJFIFEntries().stream().
             filter((e) -> !toDelete.contains(e)).
             collect(Collectors.toList());
     result.addAll(toInsert);
@@ -69,18 +72,38 @@ final class MutableJFIFMediaContainer implements MutableMediaContainer
     return result;
   }
 
+  private boolean removeMetadata(MediaContainerItem objectToRemove) throws IOException
+  {
+    int foundIndex = metaItems.indexOf(objectToRemove);
+    boolean result = false;
+    if (foundIndex >= 0) {
+      MediaContainerItem found = metaItems.get(foundIndex);
+      JFIFEntry chunk = found.getItem(JFIFEntry.class);
+      if (toDelete.indexOf(chunk) == -1) {
+        foundIndex = entries.indexOf(chunk);
+        if (foundIndex >= 0) {
+          toDelete.add(chunk);
+          result = true;
+        }
+        foundIndex = toInsert.indexOf(chunk);
+        if (foundIndex >= 0) {
+          toInsert.remove(chunk);
+          result = true;
+        }
+      }
+    }
+    return result;
+  }
+
   @Override
-  public boolean removeContent(MediaContainerItem objectToRemove)
+  public boolean removeContent(MediaContainerItem objectToRemove) throws IOException
   {
     switch (objectToRemove.getGroup()) {
       case MEDIA:
       case THUMBNAIL:
         return false;
       case METADATA:
-        JFIFEntry e = objectToRemove.getItem(JFIFEntry.class);
-        if (e != null) {
-          return toDelete.add(e);
-        }
+        return removeMetadata(objectToRemove);
     }
     return false;
   }
@@ -105,43 +128,6 @@ final class MutableJFIFMediaContainer implements MutableMediaContainer
 
   @Override
   public <C extends MediaContainerItem> C addContent(C objectToAdd)
-  {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-  }
-
-  @Override
-  public MediaContainerProvider getProvider()
-  {
-    return jfifContainer.getProvider();
-  }
-
-  @Override
-  public URL getMediaURL()
-  {
-    return null;
-  }
-
-  @Override
-  public String getMIMEType()
-  {
-    return MimeTypes.IMAGE_JPEG.getMimeType();
-  }
-
-  @Override
-  public <C extends MediaContainerItem> List<? extends C> findContainerItem(ContainerItemGroup representation,
-                                                                            Class<C> representationClass) throws IOException
-  {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-  }
-
-  @Override
-  public MutableMediaContainer createMutable()
-  {
-    return new MutableJFIFMediaContainer(this);
-  }
-
-  @Override
-  public ImageGeometrie getImageGeometrie()
   {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }

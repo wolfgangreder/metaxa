@@ -79,7 +79,7 @@ public interface MediaContainerProvider
     return createContainer(file.toURI().toURL());
   }
 
-  public MediaContainer createEmptyContainer();
+  public MutableMediaContainer createEmptyContainer();
 
   public MediaContainer copyContainer(MediaContainer container);
 

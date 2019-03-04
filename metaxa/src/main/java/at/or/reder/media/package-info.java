@@ -13,30 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.media.image.jfif;
-
-import at.or.reder.media.MediaContainer;
-import at.or.reder.media.util.MediaUtils;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.List;
-
 /**
- *
- * @author Wolfgang Reder
+ * @startuml at/or/reder/media/doc-files/classdiagram.png
+ * interface MediaContainerProvider <<factory>>{
+ * Provides extraction of Imagecontainer Data for a specfic Image-Container
+ * + createContainer(InputStream)
+ * }
+ * @enduml
  */
-public interface JFIFMediaContainer extends MediaContainer
-{
-
-  public List<JFIFEntry> getJFIFEntries();
-
-  @Override
-  public default void storeTo(OutputStream os) throws IOException
-  {
-    for (JFIFEntry e : getJFIFEntries()) {
-      MediaUtils.transferTo(e.getInputStream(),
-                            os);
-    }
-  }
-
-}
+/**
+ * <h1>Architekturübersicht</h1>
+ * <img src="doc-files/classdiagram.png" alt="Klassendiagramm">
+ */
+package at.or.reder.media;

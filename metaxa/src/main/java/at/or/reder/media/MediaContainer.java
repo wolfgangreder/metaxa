@@ -18,6 +18,7 @@ package at.or.reder.media;
 import at.or.reder.media.meta.ImageGeometrie;
 import at.or.reder.media.meta.MetadataContainerItem;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URL;
 import java.util.List;
 
@@ -44,22 +45,23 @@ public interface MediaContainer
   public URL getMediaURL();
 
   /**
+   * Returns the actual MIME Type of this container.
    *
-   * @return
+   * @return mimeType of the container
    */
   public String getMIMEType();
 
   /**
-   * Get a representaion of the Media.The Representation can be,for example a {@link java.awt.image.Image} or a
-   * {@link at.or.reder.meta.elements.MetaDataContainer}
+   * Get a representaion of the Media.The Representation can be,for example a {@link java.awt.Image} or a
+   * {@link at.or.reder.media.meta.MetadataContainerItem}
    *
-   * @param <C>
-   * @param representation
-   * @param representationClass
-   * @return
-   * @throws IOException
+   * @param <C> Representation class of item
+   * @param itemGroup the kind of item
+   * @param representationClass the representing item class
+   * @return List of found items, or empty list if nothing is found an empty list is returned
+   * @throws IOException on IOError
    */
-  public <C extends MediaContainerItem> List<? extends C> findContainerItem(ContainerItemGroup representation,
+  public <C extends MediaContainerItem> List<? extends C> findContainerItem(ContainerItemGroup itemGroup,
                                                                             Class<C> representationClass) throws
           IOException;
 
@@ -89,5 +91,7 @@ public interface MediaContainer
   public MutableMediaContainer createMutable() throws IOException;
 
   public ImageGeometrie getImageGeometrie();
+
+  public void storeTo(OutputStream os) throws IOException;
 
 }

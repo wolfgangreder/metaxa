@@ -153,7 +153,7 @@ public class JFIFMediaContainerProviderNGTest
   @Test
   public void testCreateContainer_Meta() throws Exception
   {
-    URL u = getClass().getResource("/test0001.jpg");
+    URL u = getClass().getResource("/IMG_0658.JPG");
     MediaContainer container = new JFIFMediaContainerProvider().createContainer(u);
     assertNotNull(container);
     assertTrue(container instanceof JFIFMediaContainer);

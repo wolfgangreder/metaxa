@@ -44,13 +44,13 @@ import java.util.Objects;
  *
  * @author Wolfgang Reder
  */
-final class JFIFMediaContainerImpl implements JFIFMediaContainer
+class JFIFMediaContainerImpl implements JFIFMediaContainer
 {
 
   private final URL url;
-  private final List<JFIFEntry> entries;
+  protected final List<JFIFEntry> entries;
   private final JFIFMediaContainerProvider provider;
-  private final List<MetadataContainerItem> metaItems;
+  protected final List<MetadataContainerItem> metaItems;
   private final ImageGeometrie geo;
 
   public JFIFMediaContainerImpl(JFIFMediaContainerProvider provider,

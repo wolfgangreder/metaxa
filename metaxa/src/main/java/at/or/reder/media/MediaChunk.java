@@ -58,7 +58,7 @@ public interface MediaChunk
    * Inputstream for RAW Data.
    *
    * @return raw data stream
-   * @throws IOException
+   * @throws IOException on IO Error
    */
   public InputStream getDataStream() throws IOException;
 

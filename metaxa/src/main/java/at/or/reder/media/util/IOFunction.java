@@ -17,11 +17,13 @@ package at.or.reder.media.util;
 
 import java.io.IOException;
 import java.util.Objects;
-import java.util.function.Function;
 
 /**
+ * Function wich can throw an IOException.
  *
  * @author Wolfgang Reder
+ * @param <T> Type of argument
+ * @param <R> Type of result
  */
 @FunctionalInterface
 public interface IOFunction<T, R>
@@ -32,6 +34,7 @@ public interface IOFunction<T, R>
    *
    * @param t the function argument
    * @return the function result
+   * @throws java.io.IOException on IOError
    */
   R apply(T t) throws IOException;
 
@@ -44,7 +47,7 @@ public interface IOFunction<T, R>
    * @return a composed function that first applies the {@code before} function and then applies this function
    * @throws NullPointerException if before is null
    *
-   * @see #andThen(Function)
+   * @see #andThen(at.or.reder.media.util.IOFunction)
    */
   default <V> IOFunction<V, R> compose(IOFunction<? super V, ? extends T> before)
   {
@@ -61,7 +64,7 @@ public interface IOFunction<T, R>
    * @return a composed function that first applies this function and then applies the {@code after} function
    * @throws NullPointerException if after is null
    *
-   * @see #compose(Function)
+   * @see #compose(at.or.reder.media.util.IOFunction)
    */
   default <V> IOFunction<T, V> andThen(IOFunction<? super R, ? extends V> after)
   {

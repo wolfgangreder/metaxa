@@ -17,6 +17,7 @@ package at.or.reder.media;
 
 import at.or.reder.media.meta.MetadataContainerItem;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -31,25 +32,28 @@ public interface MutableMediaContainer extends MediaContainer
    *
    * @param objectToRemove objectToRemove
    * @return {@code true} if the object was removed.
+   * @throws java.io.IOException on IO Error
    */
-  public boolean removeContent(MediaContainerItem objectToRemove);
+  public boolean removeContent(MediaContainerItem objectToRemove) throws IOException;
 
   /**
    * Removes all items of a given ContainerItemGroup.
    *
    * @param representation itemGroup
    * @return removedItems
+   * @throws java.io.IOException
    */
-  public List<MediaContainerItem> removeAll(ContainerItemGroup representation);
+  public List<MediaContainerItem> removeAll(ContainerItemGroup representation) throws IOException;
 
   /**
    * Removes all Metadata.
    *
    * @return Metadata removed.
+   * @throws java.io.IOException
    */
-  public List<MetadataContainerItem> removeMetadata();
+  public List<MetadataContainerItem> removeMetadata() throws IOException;
 
-  public List<BufferedImage> removeThumbnails();
+  public List<BufferedImage> removeThumbnails() throws IOException;
 
   /**
    * Add a new Item to the container. If only one instance of this item can be stored in the container (e.g. main image in jpeg),

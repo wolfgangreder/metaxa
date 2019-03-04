@@ -18,6 +18,7 @@ package at.or.reder.media.image.jfif.impl;
 import at.or.reder.media.MediaContainer;
 import at.or.reder.media.MediaContainerProvider;
 import at.or.reder.media.MimeTypes;
+import at.or.reder.media.MutableMediaContainer;
 import at.or.reder.media.image.jfif.JFIFEntry;
 import at.or.reder.media.image.jfif.JFIFMarker;
 import at.or.reder.media.meta.MetadataContainerItem;
@@ -101,7 +102,7 @@ public final class JFIFMediaContainerProvider implements MediaContainerProvider
   }
 
   @Override
-  public MediaContainer createEmptyContainer()
+  public MutableMediaContainer createEmptyContainer()
   {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }

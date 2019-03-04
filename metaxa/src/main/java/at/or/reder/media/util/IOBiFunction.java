@@ -32,6 +32,7 @@ public interface IOBiFunction<T, U, R>
    * @param t the first function argument
    * @param u the second function argument
    * @return the function result
+   * @throws java.io.IOException on IOError
    */
   R apply(T t,
           U u) throws IOException;
