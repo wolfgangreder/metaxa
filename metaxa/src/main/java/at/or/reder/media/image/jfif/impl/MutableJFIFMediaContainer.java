@@ -22,12 +22,16 @@ import static at.or.reder.media.ContainerItemGroup.THUMBNAIL;
 import at.or.reder.media.MediaContainerItem;
 import at.or.reder.media.MutableMediaContainer;
 import at.or.reder.media.image.jfif.JFIFEntry;
+import at.or.reder.media.image.jfif.JFIFMarker;
 import at.or.reder.media.image.jfif.JFIFMediaContainer;
+import at.or.reder.media.io.InputStreamMediaJunk;
 import at.or.reder.media.meta.MetadataContainerItem;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.stream.Collectors;
 
 /**
@@ -59,6 +63,12 @@ final class MutableJFIFMediaContainer extends JFIFMediaContainerImpl implements 
     this.jfifContainer = mc.jfifContainer;
     this.toDelete.addAll(mc.toDelete);
     this.toInsert.addAll(mc.toInsert);
+  }
+
+  @Override
+  public List<? extends MetadataContainerItem> getMetadata() throws IOException
+  {
+    return super.getMetadata(); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
@@ -109,27 +119,55 @@ final class MutableJFIFMediaContainer extends JFIFMediaContainerImpl implements 
   }
 
   @Override
-  public List<MediaContainerItem> removeAll(ContainerItemGroup representation)
+  public List<MediaContainerItem> removeAll(ContainerItemGroup representation) throws IOException
   {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    List<MediaContainerItem> foundItems = metaItems.stream().
+            filter((me) -> me.getGroup() == representation).collect(Collectors.toList());
+    ListIterator<MediaContainerItem> iter = foundItems.listIterator();
+    while (iter.hasNext()) {
+      if (removeContent(iter.next())) {
+        iter.remove();
+      }
+    }
+    return foundItems;
   }
 
   @Override
-  public List<MetadataContainerItem> removeMetadata()
+  public List<MetadataContainerItem> removeMetadata() throws IOException
   {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    List<MediaContainerItem> tmpList = removeAll(ContainerItemGroup.METADATA);
+    return tmpList.stream().
+            filter((e) -> e instanceof MetadataContainerItem).
+            map(MetadataContainerItem.class::cast).
+            collect(Collectors.toList());
   }
 
   @Override
-  public List<BufferedImage> removeThumbnails()
+  public List<BufferedImage> removeThumbnails() throws IOException
   {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    List<MediaContainerItem> tmpList = removeAll(ContainerItemGroup.THUMBNAIL);
+    return tmpList.stream().
+            filter((e) -> e instanceof MetadataContainerItem).
+            map(BufferedImage.class::cast).
+            collect(Collectors.toList());
   }
 
   @Override
   public <C extends MediaContainerItem> C addContent(C objectToAdd)
   {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    if (objectToAdd.getGroup() != ContainerItemGroup.METADATA || !MetadataContainerItem.class.isInstance(objectToAdd)) {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
+    MetadataContainerItem metaItem = MetadataContainerItem.class.cast(objectToAdd);
+    WrapperJFIFEntry entry = new WrapperJFIFEntry(JFIFMarker.APP1,
+                                                  objectToAdd.getURI(),
+                                                  new InputStreamMediaJunk(JFIFMarker.APP1.getName(),
+                                                                           -1,
+                                                                           objectToAdd.getURI(),
+                                                                           () -> objectToAdd.getItem(InputStream.class)));
+//    metaItems.add(metaItem);
+    toInsert.add(entry);
+    return objectToAdd;
   }
 
 }

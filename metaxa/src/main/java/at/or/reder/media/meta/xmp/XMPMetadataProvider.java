@@ -16,6 +16,7 @@
 package at.or.reder.media.meta.xmp;
 
 import at.or.reder.media.meta.MetadataProvider;
+import com.adobe.internal.xmp.XMPMeta;
 
 /**
  *
@@ -23,5 +24,7 @@ import at.or.reder.media.meta.MetadataProvider;
  */
 public interface XMPMetadataProvider extends MetadataProvider
 {
+
+  public XMPMetadataContainerItem createItem(XMPMeta meta);
 
 }

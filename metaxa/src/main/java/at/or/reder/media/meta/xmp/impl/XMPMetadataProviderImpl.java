@@ -18,9 +18,11 @@ package at.or.reder.media.meta.xmp.impl;
 import at.or.reder.media.MediaChunk;
 import at.or.reder.media.meta.MetadataContainerItem;
 import at.or.reder.media.meta.MetadataProvider;
+import at.or.reder.media.meta.xmp.XMPMetadataContainerItem;
 import at.or.reder.media.meta.xmp.XMPMetadataProvider;
 import at.or.reder.media.util.MediaUtils;
 import com.adobe.internal.xmp.XMPConst;
+import com.adobe.internal.xmp.XMPMeta;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Collections;
@@ -66,10 +68,18 @@ public final class XMPMetadataProviderImpl implements XMPMetadataProvider
   {
     if (xmpversion != null) {
       if (XMPConst.NS_XMP.equals(item.getExtensionName())) {
-        return Collections.singletonList(new XMPMetadataContainerItemImpl(item));
+        return Collections.singletonList(new XMPMetadataContainerItemImpl(this,
+                                                                          item));
       }
     }
     return Collections.emptyList();
+  }
+
+  @Override
+  public XMPMetadataContainerItem createItem(XMPMeta meta)
+  {
+    return new XMPMetadataContainerNewItemImpl(this,
+                                               meta);
   }
 
 }

@@ -44,7 +44,8 @@ public final class APPxEntry extends AbstractJFIFEntry
         return newAPPxEntry(is,
                             marker); // IPTC
       default:
-        throw new UnsupportedOperationException("Unexpected APPx Entry " + Integer.toHexString(marker));
+        return newAPPxEntry(is,
+                            marker);
     }
   }
 

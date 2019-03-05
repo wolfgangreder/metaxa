@@ -13,34 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.or.reder.media.meta;
+package at.or.reder.media.util;
 
-import at.or.reder.media.ContainerItemGroup;
-import at.or.reder.media.MediaContainerItem;
 import java.io.IOException;
-import java.io.OutputStream;
-import org.w3c.dom.Node;
 
 /**
  *
  * @author Wolfgang Reder
+ * @param <C> type of result
  */
-public interface MetadataContainerItem extends MediaContainerItem
+@FunctionalInterface
+public interface IOSupplier<C>
 {
 
-  public MetadataProvider getProvider();
-
-  @Override
-  public default ContainerItemGroup getGroup()
-  {
-    return ContainerItemGroup.METADATA;
-  }
-
-  public default Node getDOMTree()
-  {
-    return getItem(Node.class);
-  }
-
-  public void storeTo(OutputStream os) throws IOException;
+  public C get() throws IOException;
 
 }

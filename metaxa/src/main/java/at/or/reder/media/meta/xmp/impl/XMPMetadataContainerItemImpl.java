@@ -17,8 +17,10 @@ package at.or.reder.media.meta.xmp.impl;
 
 import at.or.reder.media.MediaChunk;
 import at.or.reder.media.meta.KeywordContainer;
+import at.or.reder.media.meta.MetadataProvider;
 import at.or.reder.media.meta.xmp.XMPMetadataContainerItem;
 import at.or.reder.media.util.MediaUtils;
+import com.adobe.internal.xmp.XMPConst;
 import com.adobe.internal.xmp.XMPException;
 import com.adobe.internal.xmp.XMPMeta;
 import com.adobe.internal.xmp.XMPMetaFactory;
@@ -42,12 +44,28 @@ import org.xml.sax.SAXException;
 public class XMPMetadataContainerItemImpl implements XMPMetadataContainerItem
 {
 
+  private final MetadataProvider provider;
   private SoftReference<XMPMeta> meta;
+  private SoftReference<Document> dom;
   private final MediaChunk chunk;
 
-  XMPMetadataContainerItemImpl(MediaChunk chunk)
+  XMPMetadataContainerItemImpl(MetadataProvider provider,
+                               MediaChunk chunk)
   {
+    this.provider = provider;
     this.chunk = chunk;
+  }
+
+  @Override
+  public MetadataProvider getProvider()
+  {
+    return provider;
+  }
+
+  @Override
+  public String getURI()
+  {
+    return XMPConst.NS_XMP;
   }
 
   private synchronized XMPMeta loadMeta() throws IOException, XMPException
@@ -67,18 +85,35 @@ public class XMPMetadataContainerItemImpl implements XMPMetadataContainerItem
     return null;
   }
 
-  private Node createDOMTree() throws IOException, SAXException, ParserConfigurationException
+  private synchronized Document createDOMDocument() throws IOException, SAXException, ParserConfigurationException
   {
-    DocumentBuilderFactory factory = DocumentBuilderFactory.newDefaultInstance();
-    DocumentBuilder builder = factory.newDocumentBuilder();
-    try (InputStream is = chunk.getDataStream()) {
-      Document doc = builder.parse(is);
-      NodeList nodeList = doc.getElementsByTagName("xmpmeta");
-      if (nodeList.getLength() > 0) {
-        return nodeList.item(0);
+    Document result = dom != null ? dom.get() : null;
+    if (result == null && chunk != null) {
+      DocumentBuilderFactory factory = DocumentBuilderFactory.newDefaultInstance();
+      factory.setNamespaceAware(true);
+      factory.setIgnoringComments(true);
+      factory.setExpandEntityReferences(false);
+      factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl",
+                         true);
+      DocumentBuilder builder = factory.newDocumentBuilder();
+      try (InputStream is = chunk.getDataStream()) {
+        result = builder.parse(is);
+        dom = new SoftReference<>(result);
       }
     }
-    return null;
+    return result;
+  }
+
+  private Node createDOMTree() throws IOException, SAXException, ParserConfigurationException
+  {
+    Document doc = createDOMDocument();
+    NodeList nodes = doc.getElementsByTagNameNS("http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+                                                "RDF");
+    if (nodes.getLength() == 1) {
+      return nodes.item(0);
+    } else {
+      return null;
+    }
   }
 
   @Override
@@ -96,6 +131,19 @@ public class XMPMetadataContainerItemImpl implements XMPMetadataContainerItem
   }
 
   @Override
+  public Node getDOMTree()
+  {
+    try {
+      return createDOMTree();
+    } catch (IOException | SAXException | ParserConfigurationException ex) {
+      MediaUtils.LOGGER.log(Level.SEVERE,
+                            null,
+                            ex);
+    }
+    return null;
+  }
+
+  @Override
   public <C> C getItem(Class<? extends C> itemClass)
   {
     try {
@@ -109,6 +157,8 @@ public class XMPMetadataContainerItemImpl implements XMPMetadataContainerItem
         return itemClass.cast(scanKeywords(loadMeta()));
       } else if (MediaChunk.class.isAssignableFrom(itemClass)) {
         return itemClass.cast(chunk);
+      } else if (Document.class.isAssignableFrom(itemClass)) {
+        return itemClass.cast(createDOMDocument());
       } else if (Node.class.isAssignableFrom(itemClass)) {
         return itemClass.cast(createDOMTree());
       }

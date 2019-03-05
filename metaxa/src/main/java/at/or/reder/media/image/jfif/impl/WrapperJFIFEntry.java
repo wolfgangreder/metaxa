@@ -17,6 +17,13 @@ package at.or.reder.media.image.jfif.impl;
 
 import at.or.reder.media.MediaChunk;
 import at.or.reder.media.image.jfif.JFIFMarker;
+import at.or.reder.media.io.ProxyInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 
 /**
  *
@@ -39,6 +46,8 @@ final class WrapperJFIFEntry extends AbstractJFIFEntry
   {
     if (dataChunk instanceof AbstractJFIFEntry) {
       return ((AbstractJFIFEntry) dataChunk).getDataOffset();
+    } else if (marker == JFIFMarker.APP1) {
+      return 5 + extensionName.getBytes(StandardCharsets.UTF_8).length;
     } else {
       return 0;
     }
@@ -59,6 +68,27 @@ final class WrapperJFIFEntry extends AbstractJFIFEntry
                         extensionName),
           extensionName);
     this.dataChunk = dataChunk;
+  }
+
+  @Override
+  public InputStream getInputStream() throws IOException
+  {
+    ByteBuffer buffer = ByteBuffer.allocate((int) getOffset());
+    buffer.order(ByteOrder.BIG_ENDIAN);
+    short s = (short) getMarker();
+    buffer.putShort(s);
+    s = (short) (getLength() + getOffset() - 2);
+    buffer.putShort(s);
+    buffer.put(getExtensionName().getBytes(StandardCharsets.UTF_8));
+    buffer.put((byte) 0);
+    return new ProxyInputStream(new ByteArrayInputStream(buffer.array()),
+                                dataChunk.getInputStream());
+  }
+
+  @Override
+  public InputStream getDataStream() throws IOException
+  {
+    return dataChunk.getInputStream();
   }
 
 }

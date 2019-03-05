@@ -44,6 +44,8 @@ final class JFIFEntryFactory
           return APPxEntry::newInstance;
         case APP2:
           return APPxEntry::newInstance;
+        case APP11:
+          return APPxEntry::newInstance;
         case COM:
           return null;
         case DAC:

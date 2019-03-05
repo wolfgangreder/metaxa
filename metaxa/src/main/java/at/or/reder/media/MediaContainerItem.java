@@ -15,8 +15,6 @@
  */
 package at.or.reder.media;
 
-import java.io.IOException;
-
 /**
  * Class representing an Item in the Mediagroup
  *
@@ -25,8 +23,10 @@ import java.io.IOException;
 public interface MediaContainerItem
 {
 
+  public String getURI();
+
   public ContainerItemGroup getGroup();
 
-  public <C> C getItem(Class<? extends C> itemClass) throws IOException;
+  public <C> C getItem(Class<? extends C> itemClass);
 
 }
