@@ -38,4 +38,9 @@ public interface ImageGeometrie
     return w * getImageHeight();
   }
 
+  public default float getMPixel()
+  {
+    return getPixelCount() / 1e6f;
+  }
+
 }

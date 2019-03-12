@@ -24,64 +24,50 @@ import java.io.IOException;
  *
  * @author Wolfgang Reder
  */
-public final class SOSEntry extends AbstractJFIFEntry
+public final class DRIEntry extends AbstractJFIFEntry
 {
 
-  public static SOSEntry newInstance(PositionInputStream is,
+  public static DRIEntry newInstance(PositionInputStream is,
                                      int marker) throws IOException
   {
     long offset = is.getPosition() - 2;
-    int length = skipToEndOfEntry(is);
-    return new SOSEntry(SegmentSourceFactory.instanceOf(is.getURL()),
+    int length = loadShort(is) - 2;
+    if (length == -1) {
+      return null;
+    }
+    skipToEndOfEntryLength(is,
+                           length);
+    return new DRIEntry(SegmentSourceFactory.instanceOf(is.getURL()),
                         marker,
-                        "SOS",
+                        "DRI",
                         length,
-                        offset,
-                        null);
+                        offset);
   }
 
-  private static boolean isSkipEndMarker(int b)
-  {
-    if (b >= 0xd0 && b <= 0xd7) {
-      return false;
-    }
-    return b != 0;
-  }
-
-  public static int skipToEndOfEntry(PositionInputStream is) throws IOException
-  {
-    boolean ffDetected;
-    int b = 0;
-    long length = is.getPosition();
-    is.setRewindReadEnabled(true);
-    do {
-      ffDetected = b == 0xff;
-      b = is.read();
-      if (b != -1) {
-        b = b & 0xff;
-      }
-    } while (b != -1 && !(ffDetected && isSkipEndMarker(b)));
-    length = is.getPosition() - length;
-    if (b != -1) {
-      length -= 2;
-      is.rewind();
-    }
-    return (int) length;
-  }
-
-  public SOSEntry(SegmentSource source,
+  public DRIEntry(SegmentSource source,
                   int marker,
                   String name,
                   int length,
-                  long offset,
-                  String extensionName)
+                  long offset)
   {
     super(source,
           marker,
           name,
           length,
           offset,
-          extensionName);
+          null);
+  }
+
+  @Override
+  public long getDataOffset()
+  {
+    return super.getDataOffset(); //To change body of generated methods, choose Tools | Templates.
+  }
+
+  @Override
+  public int getPrefixLength()
+  {
+    return super.getPrefixLength(); //To change body of generated methods, choose Tools | Templates.
   }
 
 }

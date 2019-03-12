@@ -47,7 +47,7 @@ final class JFIFEntryFactory
         case APP11:
           return APPxEntry::newInstance;
         case COM:
-          return null;
+          return COMEntry::newInstance;
         case DAC:
           return null;
         case DHT:
@@ -55,7 +55,7 @@ final class JFIFEntryFactory
         case DQT:
           return DHTEntry::newInstance;
         case DRI:
-          return null;
+          return DRIEntry::newInstance;
         case EOI:
           return EOIEntry::newInstance;
         case JPG:
@@ -94,6 +94,7 @@ final class JFIFEntryFactory
           return APPxEntry::newInstance;
         case APP14:
           return APPxEntry::newInstance;
+
       }
     }
     return null;
