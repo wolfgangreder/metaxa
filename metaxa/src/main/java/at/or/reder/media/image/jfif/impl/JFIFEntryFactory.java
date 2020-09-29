@@ -18,7 +18,7 @@ package at.or.reder.media.image.jfif.impl;
 import at.or.reder.media.image.jfif.JFIFEntry;
 import at.or.reder.media.image.jfif.JFIFMarker;
 import at.or.reder.media.io.PositionInputStream;
-import at.or.reder.media.util.IOBiFunction;
+import at.or.reder.media.util.IOTriFunction;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -34,7 +34,7 @@ import java.util.List;
 final class JFIFEntryFactory
 {
 
-  private static IOBiFunction<PositionInputStream, Integer, JFIFEntry> getFactory(JFIFMarker seg)
+  private static IOTriFunction<PositionInputStream, Integer, Integer, JFIFEntry> getFactory(JFIFMarker seg)
   {
     if (seg != null) {
       switch (seg) {
@@ -53,7 +53,7 @@ final class JFIFEntryFactory
         case DHT:
           return DHTEntry::newInstance;
         case DQT:
-          return DHTEntry::newInstance;
+          return DQTEntry::newInstance;
         case DRI:
           return DRIEntry::newInstance;
         case EOI:
@@ -100,7 +100,8 @@ final class JFIFEntryFactory
     return null;
   }
 
-  private static JFIFEntry getNextEntry(PositionInputStream is) throws IOException
+  private static JFIFEntry getNextEntry(PositionInputStream is,
+                                        int inputSequence) throws IOException
   {
     ByteBuffer buffer = ByteBuffer.allocate(2);
     buffer.order(ByteOrder.BIG_ENDIAN);
@@ -109,24 +110,27 @@ final class JFIFEntryFactory
     if (read == 2) {
       int marker = buffer.getShort() & 0xffff;
       JFIFMarker seg = JFIFMarker.valueOf(marker);
-      IOBiFunction<PositionInputStream, Integer, JFIFEntry> factory = getFactory(seg);
+      IOTriFunction<PositionInputStream, Integer, Integer, JFIFEntry> factory = getFactory(seg);
       if (factory == null) {
         throw new UnsupportedOperationException("Unknown marker " + Integer.toHexString(marker));
       }
       return factory.apply(is,
-                           marker);
+                           marker,
+                           inputSequence);
     }
     return null;
   }
 
   public static List<JFIFEntry> readDirectory(InputStream stream) throws IOException
   {
-    try (PositionInputStream is = new PositionInputStream(null,
-                                                          stream,
-                                                          2)) {
+    try ( PositionInputStream is = new PositionInputStream(null,
+                                                           stream,
+                                                           2)) {
       List<JFIFEntry> entryList = new ArrayList<>();
       JFIFEntry entry;
-      while ((entry = getNextEntry(is)) != null) {
+      int sequenceCounter = 0;
+      while ((entry = getNextEntry(is,
+                                   sequenceCounter++)) != null) {
         entryList.add(entry);
       }
       return entryList;
@@ -135,12 +139,14 @@ final class JFIFEntryFactory
 
   public static List<JFIFEntry> readDirectory(URL url) throws IOException
   {
-    try (PositionInputStream is = new PositionInputStream(url,
-                                                          url.openStream(),
-                                                          2)) {
+    try ( PositionInputStream is = new PositionInputStream(url,
+                                                           url.openStream(),
+                                                           2)) {
       List<JFIFEntry> entryList = new ArrayList<>();
       JFIFEntry entry;
-      while ((entry = getNextEntry(is)) != null) {
+      int sequenceCounter = 0;
+      while ((entry = getNextEntry(is,
+                                   sequenceCounter++)) != null) {
         entryList.add(entry);
       }
       return entryList;

@@ -65,4 +65,8 @@ public interface MutableMediaContainer extends MediaContainer
    */
   public <C extends MediaContainerItem> C addContent(C objectToAdd);
 
+  public boolean isStructureFixed();
+
+  public void setStructureFixed(boolean fixed);
+
 }

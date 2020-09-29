@@ -28,7 +28,8 @@ public final class DRIEntry extends AbstractJFIFEntry
 {
 
   public static DRIEntry newInstance(PositionInputStream is,
-                                     int marker) throws IOException
+                                     int marker,
+                                     int inputSequence) throws IOException
   {
     long offset = is.getPosition() - 2;
     int length = loadShort(is) - 2;
@@ -39,6 +40,7 @@ public final class DRIEntry extends AbstractJFIFEntry
                            length);
     return new DRIEntry(SegmentSourceFactory.instanceOf(is.getURL()),
                         marker,
+                        inputSequence,
                         "DRI",
                         length,
                         offset);
@@ -46,12 +48,14 @@ public final class DRIEntry extends AbstractJFIFEntry
 
   public DRIEntry(SegmentSource source,
                   int marker,
+                  int inputSequence,
                   String name,
                   int length,
                   long offset)
   {
     super(source,
           marker,
+          inputSequence,
           name,
           length,
           offset,

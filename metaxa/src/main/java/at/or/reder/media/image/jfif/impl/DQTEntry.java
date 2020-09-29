@@ -15,9 +15,9 @@
  */
 package at.or.reder.media.image.jfif.impl;
 
-import at.or.reder.media.io.SegmentSourceFactory;
-import at.or.reder.media.io.SegmentSource;
 import at.or.reder.media.io.PositionInputStream;
+import at.or.reder.media.io.SegmentSource;
+import at.or.reder.media.io.SegmentSourceFactory;
 import java.io.IOException;
 
 /**
@@ -28,7 +28,8 @@ public final class DQTEntry extends AbstractJFIFEntry
 {
 
   public static DQTEntry newInstance(PositionInputStream is,
-                                     int marker) throws IOException
+                                     int marker,
+                                     int inputSequence) throws IOException
   {
     long offset = is.getPosition() - 2;
     int length = loadShort(is) - 2;
@@ -39,6 +40,7 @@ public final class DQTEntry extends AbstractJFIFEntry
                            length);
     return new DQTEntry(SegmentSourceFactory.instanceOf(is.getURL()),
                         marker,
+                        inputSequence,
                         "DQT",
                         length,
                         offset);
@@ -46,28 +48,18 @@ public final class DQTEntry extends AbstractJFIFEntry
 
   public DQTEntry(SegmentSource source,
                   int marker,
+                  int inputSequence,
                   String name,
                   int length,
                   long offset)
   {
     super(source,
           marker,
+          inputSequence,
           name,
           length,
           offset,
           null);
-  }
-
-  @Override
-  public long getDataOffset()
-  {
-    return super.getDataOffset(); //To change body of generated methods, choose Tools | Templates.
-  }
-
-  @Override
-  public int getPrefixLength()
-  {
-    return super.getPrefixLength(); //To change body of generated methods, choose Tools | Templates.
   }
 
 }

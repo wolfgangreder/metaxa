@@ -16,10 +16,15 @@
 package at.or.reder.media.image.jfif.impl;
 
 import at.or.reder.media.image.jfif.JFIFMarker;
+import at.or.reder.media.io.ByteBufferSegmentSource;
 import at.or.reder.media.io.PositionInputStream;
+import at.or.reder.media.io.SegmentSource;
 import at.or.reder.media.io.SegmentSourceFactory;
+import at.or.reder.media.meta.ImageGeometrie;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 /**
  *
@@ -28,24 +33,68 @@ import java.net.URL;
 public final class APPxEntry extends AbstractJFIFEntry
 {
 
+  public static APPxEntry newAPP0Entry(ImageGeometrie geo)
+  {
+    ByteBuffer buffer = ByteBuffer.allocate(18);
+    buffer.order(ByteOrder.BIG_ENDIAN);
+    buffer.putShort((short) JFIFMarker.APP0.getMarker());
+    buffer.putShort((short) (buffer.capacity() - 2));
+    buffer.put((byte) 0x4a);
+    buffer.put((byte) 0x46);
+    buffer.put((byte) 0x49);
+    buffer.put((byte) 0x46);
+    buffer.put((byte) 0);
+    buffer.putShort((short) (0x0101));
+    switch (geo.getUnit()) {
+      case DPI:
+        buffer.put((byte) 1);
+        break;
+      case DPICM:
+        buffer.put((byte) 2);
+        break;
+      case NONE:
+      default:
+        buffer.put((byte) 0);
+        break;
+    }
+    buffer.putShort((short) geo.getDensityX());
+    buffer.putShort((short) geo.getDensityY());
+    buffer.putShort((short) 0);
+    buffer.rewind();
+    return new APPxEntry(JFIFMarker.APP0.getMarker(),
+                         1,
+                         "APP0",
+                         buffer.remaining(),
+                         "JFIF",
+                         new ByteBufferSegmentSource(buffer),
+                         0,
+                         0);
+  }
+
   public static APPxEntry newInstance(PositionInputStream is,
-                                      int marker) throws IOException
+                                      int marker,
+                                      int inputSequence) throws IOException
   {
     switch (marker) {
       case 0xffe0:
-        return newAPP0Entry(is);
+        return newAPP0Entry(is,
+                            inputSequence);
       case 0xffe1:
         return newAPPxEntry(is,
-                            marker); // Exif,XMP
+                            marker,
+                            inputSequence); // Exif,XMP
       case 0xffe2:
         return newAPPxEntry(is,
-                            marker); // ICC_PROFILE
+                            marker,
+                            inputSequence); // ICC_PROFILE
       case 0xffed:
         return newAPPxEntry(is,
-                            marker); // IPTC
+                            marker,
+                            inputSequence); // IPTC
       default:
         return newAPPxEntry(is,
-                            marker);
+                            marker,
+                            inputSequence);
     }
   }
 
@@ -62,7 +111,8 @@ public final class APPxEntry extends AbstractJFIFEntry
     return builder.toString();
   }
 
-  private static APPxEntry newAPP0Entry(PositionInputStream is) throws IOException
+  private static APPxEntry newAPP0Entry(PositionInputStream is,
+                                        int inputSequence) throws IOException
   {
     long offset = is.getPosition() - 2;
     long relPrefixStart = 2;
@@ -77,6 +127,7 @@ public final class APPxEntry extends AbstractJFIFEntry
     skipToEndOfEntryLength(is,
                            length);
     return new APPxEntry(0xffe0,
+                         inputSequence,
                          "APP0",
                          length,
                          extName,
@@ -92,7 +143,8 @@ public final class APPxEntry extends AbstractJFIFEntry
   }
 
   private static APPxEntry newAPPxEntry(PositionInputStream is,
-                                        int marker) throws IOException
+                                        int marker,
+                                        int inpuSequence) throws IOException
   {
     long offset = is.getPosition() - 2;
     long relPrefixStart = 2;
@@ -110,6 +162,7 @@ public final class APPxEntry extends AbstractJFIFEntry
     skipToEndOfEntryLength(is,
                            length);
     return new APPxEntry(marker,
+                         inpuSequence,
                          getSegmentName(marker),
                          length,
                          extName,
@@ -121,6 +174,7 @@ public final class APPxEntry extends AbstractJFIFEntry
   private final int prefixSize;
 
   public APPxEntry(int marker,
+                   int inputSequence,
                    String name,
                    int length,
                    String extensionName,
@@ -130,6 +184,26 @@ public final class APPxEntry extends AbstractJFIFEntry
   {
     super(SegmentSourceFactory.instanceOf(url),
           marker,
+          inputSequence,
+          name,
+          length,
+          offset,
+          extensionName);
+    this.prefixSize = prefixSize;
+  }
+
+  private APPxEntry(int marker,
+                    int inputSequence,
+                    String name,
+                    int length,
+                    String extensionName,
+                    SegmentSource source,
+                    long offset,
+                    int prefixSize)
+  {
+    super(source,
+          marker,
+          inputSequence,
           name,
           length,
           offset,

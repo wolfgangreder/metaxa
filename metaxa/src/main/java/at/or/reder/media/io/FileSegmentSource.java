@@ -15,7 +15,6 @@
  */
 package at.or.reder.media.io;
 
-import at.or.reder.media.io.SegmentSource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;

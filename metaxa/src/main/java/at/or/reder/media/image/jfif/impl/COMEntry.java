@@ -33,7 +33,8 @@ public final class COMEntry extends AbstractJFIFEntry
 {
 
   public static COMEntry newInstance(PositionInputStream is,
-                                     int marker) throws IOException
+                                     int marker,
+                                     int inputSequence) throws IOException
   {
     long offset = is.getPosition() - 2;
     int length = loadShort(is) - 2;
@@ -43,6 +44,7 @@ public final class COMEntry extends AbstractJFIFEntry
     skipToEndOfEntryLength(is,
                            length);
     return new COMEntry(SegmentSourceFactory.instanceOf(is.getURL()),
+                        inputSequence,
                         marker,
                         "COM",
                         length,
@@ -51,12 +53,14 @@ public final class COMEntry extends AbstractJFIFEntry
 
   public COMEntry(SegmentSource source,
                   int marker,
+                  int inputSequence,
                   String name,
                   int length,
                   long offset)
   {
     super(source,
           marker,
+          inputSequence,
           name,
           length,
           offset,
@@ -65,9 +69,9 @@ public final class COMEntry extends AbstractJFIFEntry
 
   public String getComment(Charset charSet) throws IOException
   {
-    try (InputStream is = getDataStream();
-            InputStreamReader reader = new InputStreamReader(is,
-                                                             charSet != null ? charSet : Charset.defaultCharset())) {
+    try ( InputStream is = getDataStream();
+             InputStreamReader reader = new InputStreamReader(is,
+                                                              charSet != null ? charSet : Charset.defaultCharset())) {
       StringBuilder builder = new StringBuilder();
       CharBuffer buffer = CharBuffer.allocate(getLength());
       int read;

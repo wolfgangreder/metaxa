@@ -60,6 +60,7 @@ final class WrapperJFIFEntry extends AbstractJFIFEntry
 
     super(null,
           marker.getMarker(),
+          -1,
           marker.getName(),
           getLength(marker,
                     dataChunk),

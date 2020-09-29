@@ -33,7 +33,8 @@ public class SOFEntry extends AbstractJFIFEntry
 {
 
   public static SOFEntry newInstance(PositionInputStream is,
-                                     int marker) throws IOException
+                                     int marker,
+                                     int sequenceCounter) throws IOException
   {
     long offset = is.getPosition() - 2;
     int length = loadShort(is) - 2;
@@ -44,6 +45,7 @@ public class SOFEntry extends AbstractJFIFEntry
                            length);
     return new SOFEntry(SegmentSourceFactory.instanceOf(is.getURL()),
                         marker,
+                        sequenceCounter,
                         "SOF" + Integer.toHexString(marker & 0xf),
                         length,
                         offset,
@@ -88,6 +90,7 @@ public class SOFEntry extends AbstractJFIFEntry
 
   public SOFEntry(SegmentSource source,
                   int marker,
+                  int sequenceCounter,
                   String name,
                   int length,
                   long offset,
@@ -95,6 +98,7 @@ public class SOFEntry extends AbstractJFIFEntry
   {
     super(source,
           marker,
+          sequenceCounter,
           name,
           length,
           offset,
@@ -105,7 +109,7 @@ public class SOFEntry extends AbstractJFIFEntry
   {
     ByteBuffer buffer = ByteBuffer.allocate(getLength());
     buffer.order(ByteOrder.BIG_ENDIAN);
-    try (ReadableByteChannel channel = Channels.newChannel(getDataStream())) {
+    try ( ReadableByteChannel channel = Channels.newChannel(getDataStream())) {
       int read = channel.read(buffer);
       if (read != getLength()) {
         throw new IOException("Cannot read SOFEntry");

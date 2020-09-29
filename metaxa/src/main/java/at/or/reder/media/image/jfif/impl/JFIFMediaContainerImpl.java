@@ -70,14 +70,15 @@ class JFIFMediaContainerImpl implements JFIFMediaContainer
     APPxEntry app0 = findEntry(JFIFMarker.APP0,
                                APPxEntry.class);
     SOFEntry sof = findEntry(SOFEntry.class);
-    Dimension dim = sof.getImageDimension();
+    Dimension dim = sof != null ? sof.getImageDimension() : new Dimension(0,
+                                                                          0);
     PixelUnit unit = PixelUnit.NONE;
     int xdensity = -1;
     int ydensity = -1;
     if (app0 != null) {
       ByteBuffer buffer = ByteBuffer.allocate(app0.getLength());
       buffer.order(ByteOrder.BIG_ENDIAN);
-      try (ReadableByteChannel ch = Channels.newChannel(app0.getDataStream())) {
+      try ( ReadableByteChannel ch = Channels.newChannel(app0.getDataStream())) {
         ch.read(buffer);
         buffer.rewind();
         short version = buffer.getShort();
@@ -91,8 +92,14 @@ class JFIFMediaContainerImpl implements JFIFMediaContainer
           default:
             unit = PixelUnit.NONE;
         }
-        xdensity = buffer.getShort() & 0xffff;
-        ydensity = buffer.getShort() & 0xffff;
+        short a = buffer.getShort();
+        if (a != -1) {
+          xdensity = a & 0xffff;
+        }
+        a = buffer.getShort();
+        if (a != -1) {
+          ydensity = a & 0xffff;
+        }
       }
     }
     geo = new DefaultImageGeometrie(unit,

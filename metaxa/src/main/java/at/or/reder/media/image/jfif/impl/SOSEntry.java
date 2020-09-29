@@ -28,16 +28,24 @@ public final class SOSEntry extends AbstractJFIFEntry
 {
 
   public static SOSEntry newInstance(PositionInputStream is,
-                                     int marker) throws IOException
+                                     int marker,
+                                     int sequenceCounter) throws IOException
   {
     long offset = is.getPosition() - 2;
     int length = skipToEndOfEntry(is);
     return new SOSEntry(SegmentSourceFactory.instanceOf(is.getURL()),
                         marker,
+                        sequenceCounter,
                         "SOS",
                         length,
                         offset,
                         null);
+  }
+
+  @Override
+  public int getPrefixLength()
+  {
+    return 2;
   }
 
   private static boolean isSkipEndMarker(int b)
@@ -71,6 +79,7 @@ public final class SOSEntry extends AbstractJFIFEntry
 
   public SOSEntry(SegmentSource source,
                   int marker,
+                  int sequenceCounter,
                   String name,
                   int length,
                   long offset,
@@ -78,6 +87,7 @@ public final class SOSEntry extends AbstractJFIFEntry
   {
     super(source,
           marker,
+          sequenceCounter,
           name,
           length,
           offset,

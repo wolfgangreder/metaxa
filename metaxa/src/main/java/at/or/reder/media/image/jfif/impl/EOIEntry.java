@@ -15,9 +15,9 @@
  */
 package at.or.reder.media.image.jfif.impl;
 
-import at.or.reder.media.io.SegmentSourceFactory;
-import at.or.reder.media.io.SegmentSource;
 import at.or.reder.media.io.PositionInputStream;
+import at.or.reder.media.io.SegmentSource;
+import at.or.reder.media.io.SegmentSourceFactory;
 
 /**
  *
@@ -27,21 +27,25 @@ public final class EOIEntry extends AbstractJFIFEntry
 {
 
   public static EOIEntry newInstance(PositionInputStream is,
-                                     int marker)
+                                     int marker,
+                                     int inputSequence)
   {
     return new EOIEntry(SegmentSourceFactory.instanceOf(is.getURL()),
                         marker,
+                        inputSequence,
                         is.getPosition() - 2);
   }
 
   public EOIEntry(SegmentSource source,
                   int marker,
+                  int inputSequence,
                   long offset)
   {
     super(source,
           marker,
+          inputSequence,
           "EOI",
-          0,
+          2,
           offset,
           null);
   }

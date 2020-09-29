@@ -15,9 +15,9 @@
  */
 package at.or.reder.media.image.jfif.impl;
 
-import at.or.reder.media.io.SegmentSourceFactory;
-import at.or.reder.media.io.SegmentSource;
 import at.or.reder.media.io.PositionInputStream;
+import at.or.reder.media.io.SegmentSource;
+import at.or.reder.media.io.SegmentSourceFactory;
 import java.io.IOException;
 
 /**
@@ -28,7 +28,8 @@ public class DHTEntry extends AbstractJFIFEntry
 {
 
   public static DHTEntry newInstance(PositionInputStream is,
-                                     int marker) throws IOException
+                                     int marker,
+                                     int inputSequence) throws IOException
   {
     long offset = is.getPosition() - 2;
     int length = loadShort(is) - 2;
@@ -39,6 +40,7 @@ public class DHTEntry extends AbstractJFIFEntry
                            length);
     return new DHTEntry(SegmentSourceFactory.instanceOf(is.getURL()),
                         marker,
+                        inputSequence,
                         "DHT",
                         length,
                         offset,
@@ -47,6 +49,7 @@ public class DHTEntry extends AbstractJFIFEntry
 
   public DHTEntry(SegmentSource source,
                   int marker,
+                  int inputSequence,
                   String name,
                   int length,
                   long offset,
@@ -54,6 +57,7 @@ public class DHTEntry extends AbstractJFIFEntry
   {
     super(source,
           marker,
+          inputSequence,
           name,
           length,
           offset,

@@ -44,6 +44,7 @@ final class MutableJFIFMediaContainer extends JFIFMediaContainerImpl implements 
   private final JFIFMediaContainer jfifContainer;
   private final List<JFIFEntry> toDelete = new ArrayList<>();
   private final List<JFIFEntry> toInsert = new ArrayList<>();
+  private boolean fixStructure = true;
 
   public MutableJFIFMediaContainer(JFIFMediaContainer jfifContainer) throws IOException
   {
@@ -71,14 +72,44 @@ final class MutableJFIFMediaContainer extends JFIFMediaContainerImpl implements 
     return super.getMetadata(); //To change body of generated methods, choose Tools | Templates.
   }
 
+  private int getAPP0Index(List<? extends JFIFEntry> coll)
+  {
+    for (int i = 0; i < coll.size(); ++i) {
+      JFIFEntry e = coll.get(i);
+      if (e.getMarker() == JFIFMarker.APP0.getMarker()) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
   @Override
   public List<JFIFEntry> getJFIFEntries()
   {
+    JFIFEntry nonApp1 = toInsert.stream().filter((f) -> f.getMarker() != JFIFMarker.APP1.getMarker()).findAny().orElse(null);
+    if (nonApp1 != null) {
+      throw new UnsupportedOperationException("Only APP1 segements can be inserted currently");
+    }
     List<JFIFEntry> result = super.getJFIFEntries().stream().
             filter((e) -> !toDelete.contains(e)).
             collect(Collectors.toList());
-    result.addAll(toInsert);
-    result.sort(null);
+    if (fixStructure) {
+      JFIFEntry soi = result.get(0);
+      if (!(soi instanceof SOIEntry)) {
+        SOIEntry se = SOIEntry.newInstance();
+        result.add(0,
+                   se);
+      }
+      JFIFEntry app0 = result.get(1);
+      if (app0.getMarker() != JFIFMarker.APP0.getMarker()) {
+        APPxEntry ae = APPxEntry.newAPP0Entry(jfifContainer.getImageGeometrie());
+        result.add(1,
+                   ae);
+      }
+    }
+    int app0Index = getAPP0Index(result);
+    result.addAll(app0Index + 1,
+                  toInsert);
     return result;
   }
 
@@ -168,6 +199,18 @@ final class MutableJFIFMediaContainer extends JFIFMediaContainerImpl implements 
 //    metaItems.add(metaItem);
     toInsert.add(entry);
     return objectToAdd;
+  }
+
+  @Override
+  public boolean isStructureFixed()
+  {
+    return fixStructure;
+  }
+
+  @Override
+  public void setStructureFixed(boolean fixed)
+  {
+    fixStructure = fixed;
   }
 
 }

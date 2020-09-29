@@ -114,10 +114,18 @@ public final class PositionInputStream extends InputStream
 
   public void rewind()
   {
+    rewind(false);
+  }
+
+  public void rewind(boolean reEnable)
+  {
     if (rewindBuffer != null && !rewindBuffer.isEmpty()) {
       rewindStream = rewindBuffer;
     }
-    rewindBuffer = null;
+    if (!reEnable) {
+      rewindBuffer = null;
+    }
+    position -= rewindStep;
   }
 
   @Override
@@ -129,6 +137,7 @@ public final class PositionInputStream extends InputStream
       if (result == -1) {
         rewindStream = null;
       } else {
+        ++position;
         return result;
       }
     }
@@ -187,9 +196,10 @@ public final class PositionInputStream extends InputStream
   @Override
   public void close() throws IOException
   {
-    rewindStream = null;
-    rewindBuffer = null;
-    w.close();
+    try (w) {
+      rewindStream = null;
+      rewindBuffer = null;
+    }
   }
 
   @Override
@@ -233,6 +243,7 @@ public final class PositionInputStream extends InputStream
       if (rewindStream.available() == 0) {
         rewindStream = null;
       }
+      position += result;
       return result;
     } else {
       int result = w.read(b,

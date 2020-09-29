@@ -32,8 +32,14 @@ import at.or.reder.media.MediaChunk;
  *
  * @author Wolfgang Reder
  */
-public interface JFIFEntry extends MediaChunk, Comparable<JFIFEntry>
+public interface JFIFEntry extends MediaChunk
 {
+
+  /**
+   *
+   * @return
+   */
+  public int getInputSequence();
 
   /**
    * Marker byte of JFIFEntry (e.g 0xffe0, ....)

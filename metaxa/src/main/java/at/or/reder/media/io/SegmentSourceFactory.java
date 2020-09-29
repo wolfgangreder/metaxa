@@ -15,6 +15,7 @@
  */
 package at.or.reder.media.io;
 
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Objects;
@@ -30,7 +31,12 @@ public final class SegmentSourceFactory
   {
     if ("file".equals(Objects.requireNonNull(u,
                                              "url is null").getProtocol())) {
-      return new FileSegmentSource(Paths.get(u.getFile()));
+      try {
+        return new FileSegmentSource(Paths.get(u.toURI().getPath()));
+      } catch (URISyntaxException ex) {
+        throw new IllegalArgumentException("Unsupported protokoll",
+                                           ex);
+      }
     } else {
       throw new IllegalArgumentException("Unsupported protokoll");
     }

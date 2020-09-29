@@ -15,7 +15,6 @@
  */
 package at.or.reder.media.image.jfif.impl;
 
-import at.or.reder.media.image.jfif.JFIFMarker;
 import at.or.reder.media.image.jfif.JFIFEntry;
 import at.or.reder.media.io.PositionInputStream;
 import at.or.reder.media.io.SegmentSource;
@@ -38,14 +37,17 @@ public abstract class AbstractJFIFEntry implements JFIFEntry
   private final int length;
   private final SegmentSource source;
   private final long offset;
+  private final int inputSequence;
 
   protected AbstractJFIFEntry(SegmentSource source,
                               int marker,
+                              int inputSequence,
                               String name,
                               int length,
                               long offset,
                               String extensionName)
   {
+    this.inputSequence = inputSequence;
     this.source = source;
     this.marker = marker;
     this.name = name;
@@ -58,6 +60,12 @@ public abstract class AbstractJFIFEntry implements JFIFEntry
   public int getMarker()
   {
     return marker;
+  }
+
+  @Override
+  public final int getInputSequence()
+  {
+    return inputSequence;
   }
 
   @Override
@@ -102,23 +110,6 @@ public abstract class AbstractJFIFEntry implements JFIFEntry
   public long getOffset()
   {
     return offset;
-  }
-
-  @Override
-  public int compareTo(JFIFEntry o)
-  {
-    JFIFMarker a = JFIFMarker.valueOf(marker);
-    JFIFMarker b = o != null ? JFIFMarker.valueOf(o.getMarker()) : null;
-    if (a == b) {
-      return 0;
-    }
-    if (a == null) {
-      return 1;
-    }
-    if (b == null) {
-      return -1;
-    }
-    return a.compareTo(b);
   }
 
   protected static int loadShort(PositionInputStream is) throws IOException

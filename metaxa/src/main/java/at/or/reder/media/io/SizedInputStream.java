@@ -100,7 +100,10 @@ public final class SizedInputStream extends InputStream
     if (remaining <= 0) {
       return -1;
     }
-    int result = w.read(b);
+    int result = w.read(b,
+                        0,
+                        Math.min(b.length,
+                                 remaining));
     remaining -= result;
     return result;
   }
